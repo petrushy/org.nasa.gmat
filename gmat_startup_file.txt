@@ -45,41 +45,41 @@
 # Plugins
 #-----------------------------------------------------------
 # Default plugins
-PLUGIN                  = ../plugins/libDataInterface
-PLUGIN                  = ../plugins/libEphemPropagator
-PLUGIN                  = ../plugins/libEventLocator
-PLUGIN                  = ../plugins/libFormation
-PLUGIN                  = ../plugins/libGmatFunction
-PLUGIN                  = ../plugins/libNewParameters
-PLUGIN                  = ../plugins/libPythonInterface_py39
-PLUGIN                  = ../plugins/libStation
-PLUGIN                  = ../plugins/libMatlabInterface
-# PLUGIN                  = ../plugins/libFminconOptimizer
-PLUGIN                  = ../plugins/libProductionPropagators
-PLUGIN                  = ../plugins/libGmatEstimation
-PLUGIN                  = ../plugins/libYukonOptimizer
-PLUGIN                  = ../plugins/libScriptTools
-PLUGIN                  = ../plugins/libThrustFile
-PLUGIN                  = ../plugins/libEKF
-PLUGIN                  = ../plugins/thinksys/libTLEPropagator
+PLUGIN                  = /app/R2022a/plugins/libDataInterface
+PLUGIN                  = /app/R2022a/plugins/libEphemPropagator
+PLUGIN                  = /app/R2022a/plugins/libEventLocator
+PLUGIN                  = /app/R2022a/plugins/libFormation
+PLUGIN                  = /app/R2022a/plugins/libGmatFunction
+PLUGIN                  = /app/R2022a/plugins/libNewParameters
+PLUGIN                  = /app/R2022a/plugins/libPythonInterface_py39
+PLUGIN                  = /app/R2022a/plugins/libStation
+PLUGIN                  = /app/R2022a/plugins/libMatlabInterface
+# PLUGIN                  = /app/R2022a/plugins/libFminconOptimizer
+PLUGIN                  = /app/R2022a/plugins/libProductionPropagators
+PLUGIN                  = /app/R2022a/plugins/libGmatEstimation
+PLUGIN                  = /app/R2022a/plugins/libYukonOptimizer
+PLUGIN                  = /app/R2022a/plugins/libScriptTools
+PLUGIN                  = /app/R2022a/plugins/libThrustFile
+PLUGIN                  = /app/R2022a/plugins/libEKF
+PLUGIN                  = /app/R2022a/plugins/thinksys/libTLEPropagator
 
 # Alpha plugins (disabled by default)
-# PLUGIN                  = ../plugins/libExtraPropagators
-# PLUGIN                  = ../plugins/libPolyhedronGravity
-# PLUGIN                  = ../plugins/libSaveCommand
-# PLUGIN                  = ../plugins/libExternalForceModel_py39
+# PLUGIN                  = /app/R2022a/plugins/libExtraPropagators
+# PLUGIN                  = /app/R2022a/plugins/libPolyhedronGravity
+# PLUGIN                  = /app/R2022a/plugins/libSaveCommand
+# PLUGIN                  = /app/R2022a/plugins/libExternalForceModel_py39
 
 # Internal-only plugins
-# PLUGIN                  = ../plugins/proprietary/libCsaltInterface
-# PLUGIN                  = ../plugins/proprietary/libEMTGModels
-# PLUGIN                  = ../plugins/proprietary/libMarsGRAM
-# PLUGIN                  = ../plugins/proprietary/libMsise86
-# PLUGIN                  = ../plugins/proprietary/libNRLMsise00
-# PLUGIN                  = ../plugins/proprietary/libSNOptimizer
-# PLUGIN                  = ../plugins/proprietary/libVF13Optimizer
+# PLUGIN                  = /app/R2022a/plugins/proprietary/libCsaltInterface
+# PLUGIN                  = /app/R2022a/plugins/proprietary/libEMTGModels
+# PLUGIN                  = /app/R2022a/plugins/proprietary/libMarsGRAM
+# PLUGIN                  = /app/R2022a/plugins/proprietary/libMsise86
+# PLUGIN                  = /app/R2022a/plugins/proprietary/libNRLMsise00
+# PLUGIN                  = /app/R2022a/plugins/proprietary/libSNOptimizer
+# PLUGIN                  = /app/R2022a/plugins/proprietary/libVF13Optimizer
 
 # External plugins
-PLUGIN                  = ../plugins/libOpenFramesInterface
+PLUGIN                  = /app/R2022a/plugins/libOpenFramesInterface
 
 #-----------------------------------------------------------
 # Directory/file paths
@@ -90,10 +90,10 @@ PLUGIN                  = ../plugins/libOpenFramesInterface
 # files, at runtime. If this occurs, set ROOT_PATH to the
 # absolute path to your top-level GMAT directory.
 
-ROOT_PATH                = ../
+ROOT_PATH                = /app/R2022a/
 
 #-----------------------------------------------------------
-OUTPUT_PATH              = ../output/
+OUTPUT_PATH              = /var/tmp/
 LOG_FILE                 = OUTPUT_PATH/GmatLog.txt
 SCREENSHOT_FILE          = OUTPUT_PATH/GmatScreenShot
 #-----------------------------------------------------------

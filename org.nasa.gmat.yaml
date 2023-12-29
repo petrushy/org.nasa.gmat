@@ -1,10 +1,16 @@
 app-id: org.nasa.gmat
-runtime: org.kde.Platform
-runtime-version: '5.15-22.08'
-sdk: org.kde.Sdk
+#runtime: org.kde.Platform
+#runtime-version: '5.15-22.08'
+#sdk: org.kde.Sdk
+
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+
 #runtime: org.gnome.Platform
-#runtime-version: '45'
+#runtime-version: '44'
 #sdk: org.gnome.Sdk
+
 
 command: /app/R2022a/bin/GMAT-R2022a #/app/R2022a/bin/GMAT-R2022a /app/R2022a/bin/GMAT_R2022a  # /usr/bin/sh #R2022a/bin/GMAT_R2022a
 finish-args:
@@ -17,14 +23,18 @@ finish-args:
   - --filesystem=xdg-documents
   - --filesystem=home
   - --env=TMPDIR=/var/tmp
-  - --env=OUTPUT_PATH=/var/tmp
+  - --filesystem=xdg-run/dconf
+  - --filesystem=~/.config/dconf:ro
+  - --talk-name=ca.desrt.dconf
+  - --env=DCONF_USER_CONFIG_DIR=.config/dconf
+  # - --env=OUTPUT_PATH=/var/tmp
 
 platform-extensions: org.freedesktop.Platform.GL.default
 
 add-extensions:
   org.freedesktop.Platform.GL.default:
     # directory: lib/extensions/GL
-    versions: '22.08'
+    versions: '45'
     subdirectories: true
     no-autodownload: false
 
@@ -80,6 +90,14 @@ modules:
       - type: archive
         url: https://netix.dl.sourceforge.net/project/gmat/GMAT/GMAT-R2022a/gmat-ubuntu-x64-R2022a.tar.gz
         sha256: 4648a7ef0771683266ca06c4b24acb0c584bfe593557fda67f03a0f668d992f7
+  - name: gmat-config
+    buildsystem: simple
+    build-commands:
+      - install -Dm644 gmat_startup_file.txt /app/R2022a/bin/gmat_startup_file.txt
+    sources:
+      - type: file
+        path: gmat_startup_file.txt
+
 
 # flatpak-builder -v --force-clean  build-dir org.nasa.gmat.yaml
 # flatpak-builder --user --install  --force-clean build-dir org.nasa.gmat.yaml 
