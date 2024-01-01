@@ -45,41 +45,41 @@
 # Plugins
 #-----------------------------------------------------------
 # Default plugins
-PLUGIN                  = /app/R2022a/plugins/libDataInterface
-PLUGIN                  = /app/R2022a/plugins/libEphemPropagator
-PLUGIN                  = /app/R2022a/plugins/libEventLocator
-PLUGIN                  = /app/R2022a/plugins/libFormation
-PLUGIN                  = /app/R2022a/plugins/libGmatFunction
-PLUGIN                  = /app/R2022a/plugins/libNewParameters
-PLUGIN                  = /app/R2022a/plugins/libPythonInterface_py39
-PLUGIN                  = /app/R2022a/plugins/libStation
-PLUGIN                  = /app/R2022a/plugins/libMatlabInterface
-# PLUGIN                  = /app/R2022a/plugins/libFminconOptimizer
-PLUGIN                  = /app/R2022a/plugins/libProductionPropagators
-PLUGIN                  = /app/R2022a/plugins/libGmatEstimation
-PLUGIN                  = /app/R2022a/plugins/libYukonOptimizer
-PLUGIN                  = /app/R2022a/plugins/libScriptTools
-PLUGIN                  = /app/R2022a/plugins/libThrustFile
-PLUGIN                  = /app/R2022a/plugins/libEKF
-PLUGIN                  = /app/R2022a/plugins/thinksys/libTLEPropagator
+PLUGIN                  = /app/plugins/libDataInterface
+PLUGIN                  = /app/plugins/libEphemPropagator
+PLUGIN                  = /app/plugins/libEventLocator
+PLUGIN                  = /app/plugins/libFormation
+PLUGIN                  = /app/plugins/libGmatFunction
+PLUGIN                  = /app/plugins/libNewParameters
+PLUGIN                  = /app/plugins/libPythonInterface_py39
+PLUGIN                  = /app/plugins/libStation
+PLUGIN                  = /app/plugins/libMatlabInterface
+# PLUGIN                  = /app/plugins/libFminconOptimizer
+PLUGIN                  = /app/plugins/libProductionPropagators
+PLUGIN                  = /app/plugins/libGmatEstimation
+PLUGIN                  = /app/plugins/libYukonOptimizer
+PLUGIN                  = /app/plugins/libScriptTools
+PLUGIN                  = /app/plugins/libThrustFile
+PLUGIN                  = /app/plugins/libEKF
+PLUGIN                  = /app/plugins/thinksys/libTLEPropagator
 
 # Alpha plugins (disabled by default)
-# PLUGIN                  = /app/R2022a/plugins/libExtraPropagators
-# PLUGIN                  = /app/R2022a/plugins/libPolyhedronGravity
-# PLUGIN                  = /app/R2022a/plugins/libSaveCommand
-# PLUGIN                  = /app/R2022a/plugins/libExternalForceModel_py39
+# PLUGIN                  = /app/plugins/libExtraPropagators
+# PLUGIN                  = /app/plugins/libPolyhedronGravity
+# PLUGIN                  = /app/plugins/libSaveCommand
+# PLUGIN                  = /app/plugins/libExternalForceModel_py39
 
 # Internal-only plugins
-# PLUGIN                  = /app/R2022a/plugins/proprietary/libCsaltInterface
-# PLUGIN                  = /app/R2022a/plugins/proprietary/libEMTGModels
-# PLUGIN                  = /app/R2022a/plugins/proprietary/libMarsGRAM
-# PLUGIN                  = /app/R2022a/plugins/proprietary/libMsise86
-# PLUGIN                  = /app/R2022a/plugins/proprietary/libNRLMsise00
-# PLUGIN                  = /app/R2022a/plugins/proprietary/libSNOptimizer
-# PLUGIN                  = /app/R2022a/plugins/proprietary/libVF13Optimizer
+# PLUGIN                  = /app/plugins/proprietary/libCsaltInterface
+# PLUGIN                  = /app/plugins/proprietary/libEMTGModels
+# PLUGIN                  = /app/plugins/proprietary/libMarsGRAM
+# PLUGIN                  = /app/plugins/proprietary/libMsise86
+# PLUGIN                  = /app/plugins/proprietary/libNRLMsise00
+# PLUGIN                  = /app/plugins/proprietary/libSNOptimizer
+# PLUGIN                  = /app/plugins/proprietary/libVF13Optimizer
 
 # External plugins
-PLUGIN                  = /app/R2022a/plugins/libOpenFramesInterface
+PLUGIN                  = /app/plugins/libOpenFramesInterface
 
 #-----------------------------------------------------------
 # Directory/file paths
@@ -90,7 +90,7 @@ PLUGIN                  = /app/R2022a/plugins/libOpenFramesInterface
 # files, at runtime. If this occurs, set ROOT_PATH to the
 # absolute path to your top-level GMAT directory.
 
-ROOT_PATH                = /app/R2022a/
+ROOT_PATH                = /app/
 
 #-----------------------------------------------------------
 OUTPUT_PATH              = /var/tmp/

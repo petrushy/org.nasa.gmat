@@ -3,16 +3,18 @@ app-id: org.nasa.gmat
 #runtime-version: '5.15-22.08'
 #sdk: org.kde.Sdk
 
-runtime: org.freedesktop.Platform
-runtime-version: '23.08'
-sdk: org.freedesktop.Sdk
+#runtime: org.freedesktop.Platform
+#runtime-version: '23.08'
+#sdk: org.freedesktop.Sdk
 
-#runtime: org.gnome.Platform
-#runtime-version: '44'
-#sdk: org.gnome.Sdk
+runtime: org.gnome.Platform
+runtime-version: '45'
+sdk: org.gnome.Sdk
+#sdk-extensions:
+#  - org.freedesktop.Sdk.Extension.openjdk17
 
+command: /app/bin/GMAT-R2022a #/app/R2022a/bin/GMAT-R2022a /app/R2022a/bin/GMAT_R2022a  # /usr/bin/sh #R2022a/bin/GMAT_R2022a
 
-command: /app/R2022a/bin/GMAT-R2022a #/app/R2022a/bin/GMAT-R2022a /app/R2022a/bin/GMAT_R2022a  # /usr/bin/sh #R2022a/bin/GMAT_R2022a
 finish-args:
   - --share=ipc
   # - --socket=fallback-x11
@@ -21,7 +23,7 @@ finish-args:
   - --device=dri
   - --share=network
   - --filesystem=xdg-documents
-  - --filesystem=home
+  # - --filesystem=home
   - --env=TMPDIR=/var/tmp
   - --filesystem=xdg-run/dconf
   - --filesystem=~/.config/dconf:ro
@@ -41,6 +43,10 @@ add-extensions:
 
 modules:
   - shared-modules/gtk2/gtk2.json
+  # - shared-modules/glu/glu-9.json
+
+
+
   - name: libtiff
     buildsystem: autotools
     sources:
@@ -79,31 +85,125 @@ modules:
       - type: git
         url: "https://gitlab.freedesktop.org/mesa/glu.git"
         tag: "glu-9.0.3"
-  - name: gmat
-    buildsystem: simple
-    build-commands:
-      # - tar -xzf ../gmat-ubuntu-x64-R2022a.tar.gz
-      - pwd
-      - ls
-      - cp -r  R2022a /app
+
+  - name: wxWidgets
+    buildsystem: autotools   #cmake-ninja
+    cleanup:
+      - /bin
+      - /include
+      - /lib/cmake
+      - /lib/wx
+      - /share
     sources:
       - type: archive
-        url: https://netix.dl.sourceforge.net/project/gmat/GMAT/GMAT-R2022a/gmat-ubuntu-x64-R2022a.tar.gz
-        sha256: 4648a7ef0771683266ca06c4b24acb0c584bfe593557fda67f03a0f668d992f7
+        url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5/wxWidgets-3.0.5.tar.bz2
+        sha256: 8aacd56b462f42fb6e33b4d8f5d40be5abc3d3b41348ea968aa515cc8285d813
+        # https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.4/wxWidgets-3.2.4.tar.bz2
+        #x-checker-data:
+        #  type: anitya
+        #  project-id: 5150
+        #  stable-only: true
+        #  url-template: https://github.com/wxWidgets/wxWidgets/releases/download/v$version/wxWidgets-$version.tar.bz2
+      #- type: patch
+      #  path: wx_gtkchoosernative.patch
+
+  #  - name: gmat
+  #    buildsystem: simple
+  #    build-commands:
+  #      # - tar -xzf ../gmat-ubuntu-x64-R2022a.tar.gz
+  #      - pwd
+  #      - ls
+  #      - cp -r  R2022a /app
+  #    sources:
+  #      - type: archive
+  #        url: https://netix.dl.sourceforge.net/project/gmat/GMAT/GMAT-R2022a/gmat-ubuntu-x64-R2022a.tar.gz
+  #        sha256: 4648a7ef0771683266ca06c4b24acb0c584bfe593557fda67f03a0f668d992f7
+
+  - name: tcsh
+    buildsystem: autotools
+    sources:
+      - type: archive
+        url: https://astron.com/pub/tcsh/tcsh-6.24.10.tar.gz
+        sha256: 13475c0fbeb74139d33ed793bf00ffbbb2ac2dc9fb1d44467a410760aba36664
+
+ 
+  - name: XercesC
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/app
+      - -DBUILD_SHARED_LIBS=ON
+      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      - -Dnetwork-accessor=curl
+      - -Dtranscoder=icu
+    sources:
+      - type: archive
+        url: https://dlcdn.apache.org/xerces/c/3/sources/xerces-c-3.2.5.tar.gz
+        sha256: 545cfcce6c4e755207bd1f27e319241e50e37c0c27250f11cda116018f1ef0f5
+        x-checker-data:
+          type: anitya
+          project-id: 5182
+          url-template: https://dlcdn.apache.org/xerces/c/3/sources/xerces-c-$version.tar.xz
+
+  - name: cspice
+    buildsystem: simple
+    build-commands:
+      - find . -type f -exec sed -i 's|#! /bin/csh|#! /app/bin/tcsh|' {} +
+      - cd cspice && tcsh -e -f makeall.csh
+      - 'find ./cspice/exe -type f -executable -exec install -Dm755 {} /app/bin/ \;'
+      - 'find ./cspice/include -type f -exec install -Dm755 {} /app/include/ \;'
+      - 'find ./cspice/lib -type f  -exec install -Dm755 {} /app/lib/ \;'
+      
+    sources:
+      - type: file
+        url: https://naif.jpl.nasa.gov/pub/naif/toolkit//C/PC_Linux_GCC_64bit/packages/cspice.tar.Z
+        sha256: 60a95b51a6472f1afe7e40d77ebdee43c12bb5b8823676ccc74692ddfede06ce
+      - type: shell
+        commands:
+          - gzip -d cspice.tar.Z
+          - tar -xf cspice.tar
+
+  - name: gmat
+    buildsystem: cmake-ninja
+    subdir: GMAT-R2022a
+    build-options:
+      env:
+        LIBRARY_PATH: /app/lib:/usr/lib
+        LD_LIBRARY_PATH: /app/lib:/usr/lib
+        PATH: /app/bin:/usr/bin:/usr/lib/sdk/openjdk17/bin
+        JAVA_HOME: /usr/lib/sdk/openjdk17/jvm/openjdk-17
+    config-opts:
+      - -DCSPICE_DIR=/app
+    sources:
+      - type: file
+        url: https://netcologne.dl.sourceforge.net/project/gmat/GMAT/GMAT-R2022a/gmat-src_and_data-R2022a.zip
+        sha256: b83cd0f052c74531c629be00404499fd003a4d3bca09b034f941ed6d55eae9dd
+      - type: shell
+        commands:
+          - unzip gmat-src_and_data-R2022a.zip
+
   - name: gmat-config
     buildsystem: simple
     build-commands:
-      - install -Dm644 gmat_startup_file.txt /app/R2022a/bin/gmat_startup_file.txt
+      - install -Dm644 gmat_startup_file.txt /app/bin/gmat_startup_file.txt
     sources:
       - type: file
         path: gmat_startup_file.txt
 
 
 # flatpak-builder -v --force-clean  build-dir org.nasa.gmat.yaml
-# flatpak-builder --user --install  --force-clean build-dir org.nasa.gmat.yaml 
+# flatpak-builder --user --install  --force-clean --install-deps-from --keep-build-dirs  build-dir 
 # flatpak run --command=sh --devel org.nasa.gmat
+# a bit odd this one:
+# flatpak-builder --run build-dir org.nasa.gmat.yaml sh
 
 # https://invent.kde.org/packaging/flatpak-kde-runtime
 # https://gmat.atlassian.net/wiki/spaces/GW/pages/380273314/Compiling
 # https://gmat.atlassian.net/wiki/spaces/GW/pages/380273355/Compiling+GMAT+CMake+Build+System
 # git clone git://git.code.sf.net/p/gmat/git gmat-git"
+# https://docs.flatpak.org/en/latest/index.html
+# https://gitlab.com/digitalsats/gmat2020a-box
+# https://discourse.flathub.org/
+# https://github.com/flathub
+
