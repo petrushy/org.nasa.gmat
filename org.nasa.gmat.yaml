@@ -14,13 +14,15 @@ finish-args:
   - --device=dri
   - --share=network
   - --filesystem=xdg-documents
-  # - --filesystem=home
+  - --filesystem=home
   - --env=TMPDIR=/var/tmp
   - --filesystem=xdg-run/dconf
   - --filesystem=~/.config/dconf:ro
   - --talk-name=ca.desrt.dconf
   - --env=DCONF_USER_CONFIG_DIR=.config/dconf
-  # - --env=OUTPUT_PATH=/var/tmp
+  - --env=OUTPUT_PATH=/var/tmp
+  - --env=FLATPAK=1 
+  - --env=GTK_USE_PORTAL=1
 
 platform-extensions: org.freedesktop.Platform.GL.default
 
@@ -34,7 +36,9 @@ add-extensions:
 
 modules:
   #- shared-modules/gtk2/gtk2.json
-  # - shared-modules/glu/glu-9.json
+  #- shared-modules/glu/glu-9.json
+  #- shared-modules/dbus-glib/dbus-glib.json
+  #- shared-modules/glew/glew.json
 
 
 
@@ -120,7 +124,7 @@ modules:
   #      - type: archive
   #        url: https://netix.dl.sourceforge.net/project/gmat/GMAT/GMAT-R2022a/gmat-ubuntu-x64-R2022a.tar.gz
   #        sha256: 4648a7ef0771683266ca06c4b24acb0c584bfe593557fda67f03a0f668d992f7
-
+ 
   - name: tcsh
     buildsystem: autotools
     sources:
