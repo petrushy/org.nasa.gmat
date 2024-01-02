@@ -1,19 +1,10 @@
 app-id: org.nasa.gmat
-#runtime: org.kde.Platform
-#runtime-version: '5.15-22.08'
-#sdk: org.kde.Sdk
 
-#runtime: org.freedesktop.Platform
-#runtime-version: '23.08'
-#sdk: org.freedesktop.Sdk
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
 
-runtime: org.gnome.Platform
-runtime-version: '45'
-sdk: org.gnome.Sdk
-#sdk-extensions:
-#  - org.freedesktop.Sdk.Extension.openjdk17
-
-command: /app/bin/GMAT-R2022a #/app/R2022a/bin/GMAT-R2022a /app/R2022a/bin/GMAT_R2022a  # /usr/bin/sh #R2022a/bin/GMAT_R2022a
+command: /app/bin/GMAT-R2022a
 
 finish-args:
   - --share=ipc
@@ -36,23 +27,23 @@ platform-extensions: org.freedesktop.Platform.GL.default
 add-extensions:
   org.freedesktop.Platform.GL.default:
     # directory: lib/extensions/GL
-    versions: '45'
+    versions: '23.08'
     subdirectories: true
     no-autodownload: false
 
 
 modules:
-  - shared-modules/gtk2/gtk2.json
+  #- shared-modules/gtk2/gtk2.json
   # - shared-modules/glu/glu-9.json
 
 
 
-  - name: libtiff
-    buildsystem: autotools
-    sources:
-      - type: archive
-        url: "http://download.osgeo.org/libtiff/tiff-4.1.0.tar.gz"
-        sha256: "5d29f32517dadb6dbcd1255ea5bbc93a2b54b94fbf83653b4d65c7d6775b8634"
+  # - name: libtiff
+  #   buildsystem: autotools
+  #   sources:
+  #     - type: archive
+  #       url: "http://download.osgeo.org/libtiff/tiff-4.1.0.tar.gz"
+  #       sha256: "5d29f32517dadb6dbcd1255ea5bbc93a2b54b94fbf83653b4d65c7d6775b8634"
 
   - name: python
     buildsystem: autotools
@@ -66,17 +57,17 @@ modules:
     cleanup:
       - /share/doc
 
-  - name: libjpeg # with libjpeg.so.8
-    buildsystem: cmake-ninja
-    config-opts:
-      - -DCMAKE_SKIP_RPATH:BOOL=YES
-      - -DENABLE_STATIC:BOOL=NO
-      - -DWITH_JPEG8:BOOL=YES
-      - -DCMAKE_INSTALL_LIBDIR=/app/lib # uses lib64 by default
-    sources: &libjpeg_sources
-      - type: archive
-        url: https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/2.1.3.tar.gz
-        sha256: dbda0c685942aa3ea908496592491e5ec8160d2cf1ec9d5fd5470e50768e7859
+  #- name: libjpeg # with libjpeg.so.8
+  #  buildsystem: cmake-ninja
+  #  config-opts:
+  #    - -DCMAKE_SKIP_RPATH:BOOL=YES
+  #    - -DENABLE_STATIC:BOOL=NO
+  #    - -DWITH_JPEG8:BOOL=YES
+  #    - -DCMAKE_INSTALL_LIBDIR=/app/lib # uses lib64 by default
+  #  sources: &libjpeg_sources
+  #    - type: archive
+  #      url: https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/2.1.3.tar.gz
+  #      sha256: dbda0c685942aa3ea908496592491e5ec8160d2cf1ec9d5fd5470e50768e7859
 
 
   - name: libglu
@@ -86,26 +77,37 @@ modules:
         url: "https://gitlab.freedesktop.org/mesa/glu.git"
         tag: "glu-9.0.3"
 
-  - name: wxWidgets
-    buildsystem: autotools   #cmake-ninja
+  - name: wxwidgets
+    #rm-configure: true
+    buildsystem: autotools
+    config-opts:
+      - --with-gtk=3
+      - --with-opengl
+      - --with-libjpeg
+      - --with-libtiff
+      - --with-libpng 
+      - --with-zlib
+      - --enable-unicode
+      - --enable-display
+      - --enable-propgrid
+      # - --with-libiconv=/usr
+
     cleanup:
-      - /bin
-      - /include
-      - /lib/cmake
-      - /lib/wx
-      - /share
+      #- /bin
+      #- /lib/wx
+      #- /lib/libwx*
+      #- /share/bakefile
+      #- /include/wx-*
+      #- /share/aclocal/wx*
     sources:
+      #- type: script
+      #  dest-filename: autogen.sh
+      #  commands:
+      #    - cp -p /usr/share/automake-*/config.{sub,guess} .
+      #    - autoconf -f -B build/autoconf_prepend-include
       - type: archive
-        url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5/wxWidgets-3.0.5.tar.bz2
-        sha256: 8aacd56b462f42fb6e33b4d8f5d40be5abc3d3b41348ea968aa515cc8285d813
-        # https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.4/wxWidgets-3.2.4.tar.bz2
-        #x-checker-data:
-        #  type: anitya
-        #  project-id: 5150
-        #  stable-only: true
-        #  url-template: https://github.com/wxWidgets/wxWidgets/releases/download/v$version/wxWidgets-$version.tar.bz2
-      #- type: patch
-      #  path: wx_gtkchoosernative.patch
+        url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5.1/wxWidgets-3.0.5.1.tar.bz2
+        sha256: 440f6e73cf5afb2cbf9af10cec8da6cdd3d3998d527598a53db87099524ac807
 
   #  - name: gmat
   #    buildsystem: simple
@@ -153,8 +155,7 @@ modules:
       - cd cspice && tcsh -e -f makeall.csh
       - 'find ./cspice/exe -type f -executable -exec install -Dm755 {} /app/bin/ \;'
       - 'find ./cspice/include -type f -exec install -Dm755 {} /app/include/ \;'
-      - 'find ./cspice/lib -type f  -exec install -Dm755 {} /app/lib/ \;'
-      
+      - 'find ./cspice/lib -type f  -exec install -Dm755 {} /app/lib/ \;'  
     sources:
       - type: file
         url: https://naif.jpl.nasa.gov/pub/naif/toolkit//C/PC_Linux_GCC_64bit/packages/cspice.tar.Z
@@ -163,6 +164,14 @@ modules:
         commands:
           - gzip -d cspice.tar.Z
           - tar -xf cspice.tar
+
+  #- name: openframesinterface
+  #  buildsystem: cmake-ninja
+  #  sources:
+  #    - type: archive
+  #      url: https://gitlab.com/EmergentSpaceTechnologies/OpenFramesInterface/-/archive/R2022a_v1/OpenFramesInterface-R2022a_v1.tar.gz
+  #      sha256: 5b
+
 
   - name: gmat
     buildsystem: cmake-ninja
