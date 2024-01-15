@@ -18,10 +18,16 @@ To debug
 ## Inspiration and links
 
 https://invent.kde.org/packaging/flatpak-kde-runtime
+
 https://gmat.atlassian.net/wiki/spaces/GW/pages/380273314/Compiling
+
 https://gmat.atlassian.net/wiki/spaces/GW/pages/380273355/Compiling+GMAT+CMake+Build+System
+
 https://docs.flatpak.org/en/latest/index.html
+
 https://gitlab.com/digitalsats/gmat2020a-box
+
 https://discourse.flathub.org/
+
 https://github.com/flathub
 
