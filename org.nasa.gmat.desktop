@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=GMAT
+Exec=/app/bin/GMAT-R2022a
+Icon=org.nasa.gmat
+Categories=Science;

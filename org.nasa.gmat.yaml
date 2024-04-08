@@ -35,10 +35,11 @@ add-extensions:
 
 
 modules:
-  #- shared-modules/gtk2/gtk2.json
-  #- shared-modules/glu/glu-9.json
-  #- shared-modules/dbus-glib/dbus-glib.json
-  #- shared-modules/glew/glew.json
+
+  # - shared-modules/glu/glu-9.json
+  # - shared-modules/gtk2/gtk2.json
+  # - shared-modules/dbus-glib/dbus-glib.json
+  - shared-modules/glew/glew.json
 
 
 
@@ -186,6 +187,9 @@ modules:
         LD_LIBRARY_PATH: /app/lib:/usr/lib
         PATH: /app/bin:/usr/bin:/usr/lib/sdk/openjdk17/bin
         JAVA_HOME: /usr/lib/sdk/openjdk17/jvm/openjdk-17
+    build-commands:
+      - install -Dm644 application/data/graphics/icons/GMATAboutIcon.png /app/share/icons/hicolor/256x256/apps/org.nasa.gmat.png
+
     config-opts:
       - -DCSPICE_DIR=/app
     sources:
@@ -200,9 +204,13 @@ modules:
     buildsystem: simple
     build-commands:
       - install -Dm644 gmat_startup_file.txt /app/bin/gmat_startup_file.txt
+      - install -Dm644 org.nasa.gmat.desktop /app/share/applications/org.nasa.gmat.desktop
+
     sources:
       - type: file
         path: gmat_startup_file.txt
+      - type: file
+        path: org.nasa.gmat.desktop
 
 
 # flatpak-builder -v --force-clean  build-dir org.nasa.gmat.yaml
