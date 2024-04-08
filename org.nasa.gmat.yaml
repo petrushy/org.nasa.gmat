@@ -93,10 +93,14 @@ modules:
   - name: gmat-config
     buildsystem: simple
     build-commands:
-      - install -Dm644 gmat_startup_file.txt /app/R2022a/bin/gmat_startup_file.txt
+      - install -Dm644 gmat_startup_file.txt /app/bin/gmat_startup_file.txt
+      - install -Dm644 org.nasa.gmat.desktop /app/share/applications/org.nasa.gmat.desktop
+
     sources:
       - type: file
         path: gmat_startup_file.txt
+      - type: file
+        path: org.nasa.gmat.desktop
 
 
 # flatpak-builder -v --force-clean  build-dir org.nasa.gmat.yaml
