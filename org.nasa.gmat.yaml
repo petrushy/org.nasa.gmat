@@ -9,7 +9,7 @@ sdk: org.freedesktop.Sdk
 command: /app/R2022a/bin/GMAT-R2022a #/app/R2022a/bin/GMAT-R2022a /app/R2022a/bin/GMAT_R2022a  # /usr/bin/sh #R2022a/bin/GMAT_R2022a
 finish-args:
   - --share=ipc
-  # - --socket=fallback-x11
+  - --socket=fallback-x11
   - --socket=wayland
   - --socket=x11
   - --device=dri
@@ -20,6 +20,8 @@ finish-args:
   - --filesystem=xdg-run/dconf
   - --filesystem=~/.config/dconf:ro
   - --talk-name=ca.desrt.dconf
+  - --talk-name=org.gtk.vfs.*
+  - --filesystem=xdg-run/gvfsd
   - --env=DCONF_USER_CONFIG_DIR=.config/dconf
   # - --env=OUTPUT_PATH=/var/tmp
 
