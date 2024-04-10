@@ -164,14 +164,6 @@ modules:
           - gzip -d cspice.tar.Z
           - tar -xf cspice.tar
 
-  #- name: openframesinterface
-  #  buildsystem: cmake-ninja
-  #  sources:
-  #    - type: archive
-  #      url: https://gitlab.com/EmergentSpaceTechnologies/OpenFramesInterface/-/archive/R2022a_v1/OpenFramesInterface-R2022a_v1.tar.gz
-  #      sha256: 50eac11978c8bfb4ae7c609abf358f7f6ee212a4049fad936010ffc08c0f11f2
-
-
   - name: gmat
     buildsystem: cmake-ninja
     subdir: GMAT-R2022a
@@ -181,18 +173,24 @@ modules:
         LD_LIBRARY_PATH: /app/lib:/usr/lib
         PATH: /app/bin:/usr/bin:/usr/lib/sdk/openjdk17/bin
         JAVA_HOME: /usr/lib/sdk/openjdk17/jvm/openjdk-17
+        
     build-commands:
       - install -Dm644 application/data/graphics/icons/GMATAboutIcon.png /app/share/icons/hicolor/256x256/apps/org.nasa.gmat.png
 
     config-opts:
       - -DCSPICE_DIR=/app
+      - -DGMAT_ADDITIONAL_PLUGINS=./OpenFramesInterface-R2022a_v1/OpenFramesInterface_AdditionalPlugin.txt
     sources:
       - type: file
         url: https://netcologne.dl.sourceforge.net/project/gmat/GMAT/GMAT-R2022a/gmat-src_and_data-R2022a.zip
         sha256: b83cd0f052c74531c629be00404499fd003a4d3bca09b034f941ed6d55eae9dd
+      - type: file
+        url: https://gitlab.com/EmergentSpaceTechnologies/OpenFramesInterface/-/archive/R2022a_v1/OpenFramesInterface-R2022a_v1.tar.gz
+        sha256: 50eac11978c8bfb4ae7c609abf358f7f6ee212a4049fad936010ffc08c0f11f2
       - type: shell
         commands:
           - unzip gmat-src_and_data-R2022a.zip
+          - tar -xvf OpenFramesInterface-R2022a_v1.tar.gz -C GMAT-R2022a
 
   - name: gmat-config
     buildsystem: simple
