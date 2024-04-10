@@ -1,15 +1,9 @@
 app-id: org.nasa.gmat
-#runtime: org.kde.Platform
-#runtime-version: '5.15-22.08'
-#sdk: org.kde.Sdk
 
 runtime: org.freedesktop.Platform
 runtime-version: '23.08'
 sdk: org.freedesktop.Sdk
 
-#runtime: org.gnome.Platform
-#runtime-version: '44'
-#sdk: org.gnome.Sdk
 
 
 command: /app/R2022a/bin/GMAT-R2022a #/app/R2022a/bin/GMAT-R2022a /app/R2022a/bin/GMAT_R2022a  # /usr/bin/sh #R2022a/bin/GMAT_R2022a
@@ -34,13 +28,15 @@ platform-extensions: org.freedesktop.Platform.GL.default
 add-extensions:
   org.freedesktop.Platform.GL.default:
     # directory: lib/extensions/GL
-    versions: '45'
+    versions: '23.08'
     subdirectories: true
     no-autodownload: false
 
 
 modules:
   - shared-modules/gtk2/gtk2.json
+  - shared-modules/glu/glu-9.json
+ 
   - name: libtiff
     buildsystem: autotools
     sources:
@@ -73,19 +69,12 @@ modules:
         sha256: dbda0c685942aa3ea908496592491e5ec8160d2cf1ec9d5fd5470e50768e7859
 
 
-  - name: libglu
-    buildsystem: meson
-    sources:
-      - type: git
-        url: "https://gitlab.freedesktop.org/mesa/glu.git"
-        tag: "glu-9.0.3"
   - name: gmat
     buildsystem: simple
     build-commands:
-      # - tar -xzf ../gmat-ubuntu-x64-R2022a.tar.gz
-      - pwd
-      - ls
       - cp -r  R2022a /app
+      - install -Dm644 R2022a/data/graphics/icons/GMATAboutIcon.png /app/share/icons/hicolor/256x256/apps/org.nasa.gmat.png
+
     sources:
       - type: archive
         url: https://netix.dl.sourceforge.net/project/gmat/GMAT/GMAT-R2022a/gmat-ubuntu-x64-R2022a.tar.gz
