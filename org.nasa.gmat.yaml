@@ -37,7 +37,7 @@ add-extensions:
 modules:
 
   # - shared-modules/glu/glu-9.json
-  # - shared-modules/gtk2/gtk2.json
+  - shared-modules/gtk2/gtk2.json
   # - shared-modules/dbus-glib/dbus-glib.json
   - shared-modules/glew/glew.json
 
@@ -86,15 +86,9 @@ modules:
     #rm-configure: true
     buildsystem: autotools
     config-opts:
-      - --with-gtk=3
+      - --with-gtk=2
       - --with-opengl
-      - --with-libjpeg
-      - --with-libtiff
-      - --with-libpng 
-      - --with-zlib
       - --enable-unicode
-      - --enable-display
-      - --enable-propgrid
       # - --with-libiconv=/usr
 
     cleanup:
@@ -111,8 +105,8 @@ modules:
       #    - cp -p /usr/share/automake-*/config.{sub,guess} .
       #    - autoconf -f -B build/autoconf_prepend-include
       - type: archive
-        url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5.1/wxWidgets-3.0.5.1.tar.bz2
-        sha256: 440f6e73cf5afb2cbf9af10cec8da6cdd3d3998d527598a53db87099524ac807
+        url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.4/wxWidgets-3.0.4.tar.bz2
+        sha256: 96157f988d261b7368e5340afa1a0cad943768f35929c22841f62c25b17bf7f0
 
   #  - name: gmat
   #    buildsystem: simple
@@ -175,7 +169,7 @@ modules:
   #  sources:
   #    - type: archive
   #      url: https://gitlab.com/EmergentSpaceTechnologies/OpenFramesInterface/-/archive/R2022a_v1/OpenFramesInterface-R2022a_v1.tar.gz
-  #      sha256: 5b
+  #      sha256: 50eac11978c8bfb4ae7c609abf358f7f6ee212a4049fad936010ffc08c0f11f2
 
 
   - name: gmat
