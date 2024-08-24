@@ -15,6 +15,19 @@ To run:
 To debug
     flatpak run --command=sh --devel org.nasa.gmat
 
+## Checking out the repository
+
+See https://docs.flatpak.org/en/latest/manifests.html
+
+Clone the repository with (other ways possible):
+
+    git clone https://github.com/petrushy/org.nasa.gmat.git
+
+check out the shared modules
+
+    git submodule update --init
+    
+
 ## Inspiration and links
 
 https://invent.kde.org/packaging/flatpak-kde-runtime

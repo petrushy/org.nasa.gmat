@@ -214,7 +214,7 @@ modules:
 
 
 # flatpak-builder -v --force-clean  build-dir org.nasa.gmat.yaml
-# flatpak-builder --user --install  --force-clean --install-deps-from --keep-build-dirs  build-dir 
+# flatpak-builder --user --install  --force-clean --install-deps-from --keep-build-dirs  build-dir org.nasa.gmat.yaml
 # flatpak run --command=sh --devel org.nasa.gmat
 # a bit odd this one:
 # flatpak-builder --run build-dir org.nasa.gmat.yaml sh
