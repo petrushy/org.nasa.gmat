@@ -1,12 +1,12 @@
 # Flatpak manifest for GMAT
 
-This is a flatpak manifest to build the GMAT tool in a reproducable flatpak container.
+This is a flatpak manifest to build the GMAT tool in a reproducable flatpak container. This is used for linux install in a sandboxed environment, so no external dependencies are needed.
 
 This manifest is not from the GMAT project and has no affiliaction with it. Use it at your own risk.
 
 To build it and install on user do:
 
-    flatpak-builder --user --install  --force-clean --install-deps-from --keep-build-dirs  build-dir 
+    flatpak-builder --user --install  --force-clean --install-deps-from --keep-build-dirs  build-dir org.nasa.gmat.yaml 
 
 To run:
 
