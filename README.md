@@ -26,6 +26,10 @@ Clone the repository with (other ways possible):
 check out the shared modules
 
     git submodule update --init
+
+Update submodules
+    
+    git submodule update --remote --merge
     
 
 ## Inspiration and links
