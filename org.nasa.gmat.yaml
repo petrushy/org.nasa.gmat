@@ -1,7 +1,7 @@
 app-id: org.nasa.gmat
 
 runtime: org.freedesktop.Platform
-runtime-version: '23.08'
+runtime-version: '24.08'
 sdk: org.freedesktop.Sdk
 
 command: /app/bin/GMAT-R2022a
@@ -29,7 +29,7 @@ platform-extensions: org.freedesktop.Platform.GL.default
 add-extensions:
   org.freedesktop.Platform.GL.default:
     # directory: lib/extensions/GL
-    versions: '23.08'
+    versions: '24.08'
     subdirectories: true
     no-autodownload: false
 
