@@ -55,14 +55,16 @@ PLUGIN                  = /app/plugins/libPythonInterface_py312
 PLUGIN                  = /app/plugins/libStation
 # PLUGIN                  = /app/plugins/libMatlabInterface
 PLUGIN                  = /app/plugins/libMsise00
-# PLUGIN                  = /app/plugins/libFminconOptimizer  # requires MATLAB's fmincon (proprietary)
+# libFminconOptimizer requires MATLAB's fmincon function (proprietary, not available)
+# PLUGIN                  = /app/plugins/libFminconOptimizer
 PLUGIN                  = /app/plugins/libProductionPropagators
 PLUGIN                  = /app/plugins/libGmatEstimation
 PLUGIN                  = /app/plugins/libYukonOptimizer
 PLUGIN                  = /app/plugins/libScriptTools
 PLUGIN                  = /app/plugins/libThrustFile
 PLUGIN                  = /app/plugins/libEKF
-PLUGIN                  = /app/plugins/thinksys/libTLEPropagator  # third-party: ThinksysLab
+# third-party plugin: ThinksysLab (Apache-2.0, bundled with GMAT R2026a)
+PLUGIN                  = /app/plugins/thinksys/libTLEPropagator
 
 # Alpha plugins (disabled by default)
 # PLUGIN                  = /app/plugins/libExtraPropagators
