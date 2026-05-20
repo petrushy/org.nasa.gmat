@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.nasa.gmat</id>
+  <name>GMAT</name>
+  <summary>General Mission Analysis Tool for space mission design and optimization</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+  <developer id="gov.nasa">
+    <name>NASA Goddard Space Flight Center</name>
+  </developer>
+
+  <description>
+    <p>
+      GMAT (General Mission Analysis Tool) is an open-source space mission design,
+      optimization, and navigation tool developed by NASA. It is used for real-world
+      mission operations and advanced research across the full mission lifecycle.
+    </p>
+    <p>Features include:</p>
+    <ul>
+      <li>Spacecraft trajectory design and optimization</li>
+      <li>High-fidelity orbit propagation with multiple force models</li>
+      <li>Lunar, interplanetary, and libration point mission design</li>
+      <li>Targeting and optimization via differential correction and NLP solvers</li>
+      <li>3D orbit visualization via OpenFrames</li>
+      <li>Python and MATLAB scripting interfaces</li>
+      <li>Navigation and estimation tools</li>
+      <li>SPICE kernel support via NAIF CSPICE</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">org.nasa.gmat.desktop</launchable>
+
+  <url type="homepage">https://gmat.atlassian.net/wiki/spaces/GW/overview</url>
+  <url type="bugtracker">https://gmat.atlassian.net/jira/software/c/projects/GMT/issues</url>
+  <url type="help">https://gmat.atlassian.net/wiki/spaces/GW/pages/380273314/Compiling</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>GMAT main window with mission sequence and resource tree</caption>
+    </screenshot>
+  </screenshots>
+
+  <releases>
+    <release version="R2026a" date="2026-04-01">
+      <description>
+        <p>GMAT R2026a release with updated Python interface (3.12), new MSISE-00
+        atmosphere model plugin, and OpenFrames R2025a visualization update.</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1" />
+
+  <categories>
+    <category>Science</category>
+    <category>Education</category>
+  </categories>
+
+  <keywords>
+    <keyword>space</keyword>
+    <keyword>astrodynamics</keyword>
+    <keyword>orbit</keyword>
+    <keyword>trajectory</keyword>
+    <keyword>mission</keyword>
+    <keyword>satellite</keyword>
+    <keyword>NASA</keyword>
+  </keywords>
+
+  <provides>
+    <binary>GMAT</binary>
+  </provides>
+</component>

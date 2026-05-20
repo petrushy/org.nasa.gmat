@@ -51,9 +51,10 @@ PLUGIN                  = /app/plugins/libEventLocator
 PLUGIN                  = /app/plugins/libFormation
 PLUGIN                  = /app/plugins/libGmatFunction
 PLUGIN                  = /app/plugins/libNewParameters
-PLUGIN                  = /app/plugins/libPythonInterface_py39
+PLUGIN                  = /app/plugins/libPythonInterface_py312
 PLUGIN                  = /app/plugins/libStation
-PLUGIN                  = /app/plugins/libMatlabInterface
+# PLUGIN                  = /app/plugins/libMatlabInterface
+PLUGIN                  = /app/plugins/libMsise00
 # PLUGIN                  = /app/plugins/libFminconOptimizer
 PLUGIN                  = /app/plugins/libProductionPropagators
 PLUGIN                  = /app/plugins/libGmatEstimation
@@ -67,7 +68,7 @@ PLUGIN                  = /app/plugins/thinksys/libTLEPropagator
 # PLUGIN                  = /app/plugins/libExtraPropagators
 # PLUGIN                  = /app/plugins/libPolyhedronGravity
 # PLUGIN                  = /app/plugins/libSaveCommand
-# PLUGIN                  = /app/plugins/libExternalForceModel_py39
+# PLUGIN                  = /app/plugins/libExternalForceModel_py312
 
 # Internal-only plugins
 # PLUGIN                  = /app/plugins/proprietary/libCsaltInterface
@@ -78,8 +79,9 @@ PLUGIN                  = /app/plugins/thinksys/libTLEPropagator
 # PLUGIN                  = /app/plugins/proprietary/libSNOptimizer
 # PLUGIN                  = /app/plugins/proprietary/libVF13Optimizer
 
-# External plugins
-PLUGIN                  = /app/plugins/libOpenFramesInterface
+# External plugins (require OpenSceneGraph, not in freedesktop runtime — disabled)
+# PLUGIN                  = /app/plugins/libOpenFramesInterface
+# PLUGIN                  = /app/plugins/libOVtoOFI
 
 #-----------------------------------------------------------
 # Directory/file paths
@@ -196,7 +198,8 @@ EARTH_EXPONENTIAL_FILE   = ATMOSPHERE_PATH/EarthExponentialAtmosphereData.txt
 MARS_ATMOSPHERE_PATH     = DATA_PATH/atmosphere/mars
 MARS_EXPONENTIAL_FILE    = MARS_ATMOSPHERE_PATH/MarsExponentialAtmosphereData.txt
 #-----------------------------------------------------------
-HELP_FILE                = ROOT_PATH/docs/help/help.chm
+HELP_PATH                = ROOT_PATH/docs/help
+HELP_HTML_FILE           = HELP_PATH/help.html
 #-----------------------------------------------------------
 ICRF_FILE                = DATA_PATH/icrf/ICRF_Table.txt
 #-----------------------------------------------------------

@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=GMAT
-Exec=/app/bin/GMAT-R2022a
+Exec=/app/bin/gmat-launch.sh
 Icon=org.nasa.gmat
 Categories=Science;
