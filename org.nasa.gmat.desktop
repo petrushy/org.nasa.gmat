@@ -1,6 +1,11 @@
 [Desktop Entry]
 Type=Application
 Name=GMAT
+GenericName=Mission Analysis Tool
+Comment=Space mission design, optimization, and navigation
 Exec=/app/bin/gmat-launch.sh
 Icon=org.nasa.gmat
-Categories=Science;
+Categories=Science;Education;
+Keywords=space;orbit;astrodynamics;trajectory;satellite;NASA;mission;
+StartupNotify=true
+StartupWMClass=GMAT

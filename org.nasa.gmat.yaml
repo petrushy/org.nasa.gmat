@@ -33,6 +33,39 @@ add-extensions:
     subdirectories: true
     no-autodownload: false
 
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /lib/*.a
+  - /lib/*.la
+  - /share/aclocal
+  - /share/bakefile
+  # tcsh is only needed at build time (to run cspice's makeall.csh)
+  - /bin/tcsh
+  # Xerces-C CLI tools — only the shared library is needed at runtime
+  - /bin/CreateDOMDocument
+  - /bin/DOMCount
+  - /bin/DOMPrint
+  - /bin/EnumVal
+  - /bin/MemParse
+  - /bin/PParse
+  - /bin/PSVIWriter
+  - /bin/Redirect
+  - /bin/SAX2Count
+  - /bin/SAX2Print
+  - /bin/SAXCount
+  - /bin/SAXPrint
+  - /bin/SCMPrint
+  - /bin/SEnumVal
+  - /bin/StdInParse
+  - /bin/XInclude
+  # Python dev/migration tools not needed at runtime
+  - /bin/idle3.12
+  - /bin/pydoc3.12
+  - /bin/2to3-3.12
+  # Python test suite and Python 2→3 migration library
+  - /lib/python3.12/test
+  - /lib/python3.12/lib2to3
 
 modules:
 
@@ -82,6 +115,7 @@ modules:
       - type: git
         url: "https://gitlab.freedesktop.org/mesa/glu.git"
         tag: "glu-9.0.3"
+        commit: a2b96c7bba8db8fec3e02fb4227a7f7b02cabad1
 
   - name: wxwidgets
     #rm-configure: true
@@ -146,10 +180,14 @@ modules:
         x-checker-data:
           type: anitya
           project-id: 5182
-          url-template: https://dlcdn.apache.org/xerces/c/3/sources/xerces-c-$version.tar.xz
+          url-template: https://dlcdn.apache.org/xerces/c/3/sources/xerces-c-$version.tar.gz
 
+  # cspice is distributed as a pre-compiled x86_64 Linux binary by NAIF/JPL.
+  # aarch64 support would require building from source (NAIF does not publish an aarch64 build).
   - name: cspice
     buildsystem: simple
+    only-arches:
+      - x86_64
     build-commands:
       - find . -type f -exec sed -i 's|#! /bin/csh|#! /app/bin/tcsh|' {} +
       - cd cspice && tcsh -e -f makeall.csh
@@ -158,7 +196,7 @@ modules:
       - 'find ./cspice/lib -type f  -exec install -Dm755 {} /app/lib/ \;'  
     sources:
       - type: file
-        url: https://naif.jpl.nasa.gov/pub/naif/toolkit//C/PC_Linux_GCC_64bit/packages/cspice.tar.Z
+        url: https://naif.jpl.nasa.gov/pub/naif/toolkit/C/PC_Linux_GCC_64bit/packages/cspice.tar.Z
         sha256: 60a95b51a6472f1afe7e40d77ebdee43c12bb5b8823676ccc74692ddfede06ce
       - type: shell
         commands:
@@ -225,8 +263,7 @@ modules:
         path: gmat-launch.sh
 
 
-# flatpak-builder -v --force-clean build-dir org.nasa.gmat.yaml
-# flatpak-builder --user --install --force-clean --install-deps-from --keep-build-dirs build-dir org.nasa.gmat.yaml
+# flatpak run org.flatpak.Builder --user --install --force-clean build-dir org.nasa.gmat.yaml
 # flatpak run --command=sh --devel org.nasa.gmat
 # flatpak-builder --run build-dir org.nasa.gmat.yaml sh
 

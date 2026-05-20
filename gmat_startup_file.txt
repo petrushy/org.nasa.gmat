@@ -55,14 +55,14 @@ PLUGIN                  = /app/plugins/libPythonInterface_py312
 PLUGIN                  = /app/plugins/libStation
 # PLUGIN                  = /app/plugins/libMatlabInterface
 PLUGIN                  = /app/plugins/libMsise00
-# PLUGIN                  = /app/plugins/libFminconOptimizer
+# PLUGIN                  = /app/plugins/libFminconOptimizer  # requires MATLAB's fmincon (proprietary)
 PLUGIN                  = /app/plugins/libProductionPropagators
 PLUGIN                  = /app/plugins/libGmatEstimation
 PLUGIN                  = /app/plugins/libYukonOptimizer
 PLUGIN                  = /app/plugins/libScriptTools
 PLUGIN                  = /app/plugins/libThrustFile
 PLUGIN                  = /app/plugins/libEKF
-PLUGIN                  = /app/plugins/thinksys/libTLEPropagator
+PLUGIN                  = /app/plugins/thinksys/libTLEPropagator  # third-party: ThinksysLab
 
 # Alpha plugins (disabled by default)
 # PLUGIN                  = /app/plugins/libExtraPropagators
@@ -154,7 +154,7 @@ MGNP180U_FILE            = VENUS_POT_PATH/MGNP180U.cof
 LP165P_FILE              = LUNA_POT_PATH/LP165P.cof
 #-----------------------------------------------------------
 GUI_CONFIG_PATH          = DATA_PATH/gui_config/
-PERSONALIZATION_FILE     = /var/tmp/MyGmat.ini
+PERSONALIZATION_FILE     = /var/config/MyGmat.ini
 
 #PERSONALIZATION_FILE     = GUI_CONFIG_PATH/MyGmat.ini
 #-----------------------------------------------------------

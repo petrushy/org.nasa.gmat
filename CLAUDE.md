@@ -103,8 +103,12 @@ GMAT's cmake installs `GMATWin32.ico` (Windows ICO format) as the app icon, but 
 - `libMatlabInterface` is **commented out** — MATLAB is not installed in the Flatpak
 - `libOpenFramesInterface` and `libOVtoOFI` are **commented out** — these require OpenSceneGraph (OSG), which is not in the freedesktop 25.08 runtime. Future enhancement: add OSG as a module and enable `-DPLUGIN_OPENFRAMESINTERFACE=ON`
 
+### Cleanup
+
+A global `cleanup` section strips development artifacts and unused tools from the final bundle before export. It runs during the finish phase and does NOT invalidate module build caches. Current cleanup removes: all headers (`/include`), pkg-config files, static libs (`.a`, `.la`), wxWidgets build-system files (`bakefile`, `aclocal`), tcsh (only needed at build time for cspice), Xerces-C CLI tools, unused Python tools (idle, pydoc, 2to3), and the Python test suite and lib2to3.
+
 ### Remaining work for Flathub submission
 
-- Add a real screenshot to `org.nasa.gmat.metainfo.xml`
+- Add a real screenshot to `org.nasa.gmat.metainfo.xml` (required by Flathub — add `<image>` URL inside the `<screenshot>` block)
 - Tighten sandbox: `--filesystem=home` is too broad; narrow to specific paths
-- Add a `cleanup` section to strip dev headers and static libs from the bundle
+- aarch64 support: cspice is currently x86_64-only (pre-compiled binary from NAIF); building cspice from source would enable aarch64
