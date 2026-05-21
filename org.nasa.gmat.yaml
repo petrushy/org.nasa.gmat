@@ -23,6 +23,8 @@ finish-args:
   - --env=OUTPUT_PATH=/var/tmp
   - --env=FLATPAK=1 
   - --env=GTK_USE_PORTAL=1
+  # Make OSG find fonts bundled from the freedesktop runtime (arial.ttf alias + LiberationMono)
+  - --env=OSG_FILE_PATH=/app/share/osg-fonts
 
 platform-extensions: org.freedesktop.Platform.GL.default
 
@@ -182,6 +184,57 @@ modules:
           project-id: 5182
           url-template: https://dlcdn.apache.org/xerces/c/3/sources/xerces-c-$version.tar.gz
 
+  # OpenSceneGraph: 3D scene graph library required by OpenFrames / OpenFramesInterface.
+  # Using the exact commit that OpenFramesInterface R2025a_v1 pins (a827840ba, post-3.6.5 changelog).
+  # Only the plugins actually used by OpenFrames are enabled; applications and examples are omitted.
+  - name: openscenegraph
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+      - -DBUILD_OSG_APPLICATIONS=OFF
+      - -DBUILD_OSG_EXAMPLES=OFF
+      - -DBUILD_DOCUMENTATION=OFF
+      - -DBUILD_OSG_DEPRECATED_SERIALIZERS=OFF
+      - -DBUILD_OSG_PLUGINS_BY_DEFAULT=OFF
+      - -DBUILD_OSG_PLUGIN_3DS=ON
+      - -DBUILD_OSG_PLUGIN_BMP=ON
+      - -DBUILD_OSG_PLUGIN_DXF=ON
+      - -DBUILD_OSG_PLUGIN_FREETYPE=ON
+      - -DBUILD_OSG_PLUGIN_GIF=ON
+      - -DBUILD_OSG_PLUGIN_JPEG=ON
+      - -DBUILD_OSG_PLUGIN_LOGO=ON
+      - -DBUILD_OSG_PLUGIN_LWO=ON
+      - -DBUILD_OSG_PLUGIN_OBJ=ON
+      - -DBUILD_OSG_PLUGIN_OSG=ON
+      - -DBUILD_OSG_PLUGIN_PNG=ON
+      - -DBUILD_OSG_PLUGIN_RGB=ON
+      - -DBUILD_OSG_PLUGIN_STL=ON
+      - -DBUILD_OSG_PLUGIN_TIFF=ON
+      - -DOSG_TEXT_USE_FONTCONFIG=OFF
+    sources:
+      - type: archive
+        url: https://github.com/openscenegraph/OpenSceneGraph/archive/a827840baf0786d72e11ac16d5338a4ee25779db.tar.gz
+        sha256: 8f6897a3831464981796269c5536fe64ffb55842c4a159e1b441738e432b8994
+
+  # OpenFrames: high-level 3D space visualization library built on OSG.
+  # Commit 03764309 is what OpenFramesInterface R2025a_v1 pins via its SetupOpenFrames.cmake.
+  - name: openframes
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DOSG_DIR=/app
+      - -DOF_BUILD_DEMOS=OFF
+      - -DOF_PYTHON_MODULE=OFF
+      - -DOF_FORTRAN_MODULE=OFF
+      - -DOF_VR_TYPE=OpenVR Stub
+    sources:
+      - type: archive
+        url: https://github.com/ravidavi/OpenFrames/archive/037643090d42c3ff804584f69b13b3b6511a8b66.tar.gz
+        sha256: ebe87782c1ed7c673d1ee3276b4e94072ea49a081c10b146d0d1d018c86dd66b
+
   # cspice is distributed as a pre-compiled x86_64 Linux binary by NAIF/JPL.
   # aarch64 support would require building from source (NAIF does not publish an aarch64 build).
   - name: cspice
@@ -218,6 +271,9 @@ modules:
 
     config-opts:
       - -DCSPICE_DIR=/app
+      - -DPLUGIN_OPENFRAMESINTERFACE=ON
+      - -DOPENFRAMESINTERFACE_USE_OSGEARTH=OFF
+      - -DOSG_DIR=/app
     sources:
       - type: file
         url: https://downloads.sourceforge.net/project/gmat/GMAT/GMAT-R2026a/GMAT-src_and_data-R2026a.zip
@@ -237,12 +293,37 @@ modules:
           - sed -i 's/strcpy(constName\[i\],r\.constName\[i\]);/memcpy(constName[i], r.constName[i], 6);/g' GMAT-R2026a/src/base/solarsys/DeFile.hpp
           - cp GMAT-R2026a/application/data/graphics/icons/GMAT_logo.png GMAT-R2026a/application/data/graphics/icons/GMATWin32.ico
           - printf 'OpenFramesInterface = ../OpenFramesInterface-R2025a_v1\nOVtoOFI = OVtoOFI\n' > GMAT-R2026a/plugins/ListOfAdditionalPlugins.txt
+          # Flatpak: OFI's cmake uses FetchContent to download OSG and OpenFrames at configure time,
+          # which fails in Flatpak's offline build environment. Replace SetupOSG.cmake and
+          # SetupOpenFrames.cmake with minimal versions that find the pre-built libs at /app.
+          - echo 'SET(OSG_DIR "/app" CACHE PATH "OSG" FORCE)' > GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/CMakeModules/SetupOSG.cmake
+          - echo 'SET(ENV{OSG_DIR} "/app")' >> GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/CMakeModules/SetupOSG.cmake
+          - echo 'SET(ENV{OSG_ROOT} "/app")' >> GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/CMakeModules/SetupOSG.cmake
+          - echo 'FIND_PACKAGE(OpenSceneGraph 3.6.5 QUIET REQUIRED COMPONENTS osg osgDB osgGA osgText)' >> GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/CMakeModules/SetupOSG.cmake
+          - echo 'SET(OPENFRAMES_DIR "/app" CACHE PATH "OpenFrames" FORCE)' > GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/CMakeModules/SetupOpenFrames.cmake
+          - echo 'FIND_PATH(OPENFRAMES_INCLUDE_DIR NAMES OpenFrames/ReferenceFrame.hpp PATHS /app/include NO_DEFAULT_PATH)' >> GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/CMakeModules/SetupOpenFrames.cmake
+          - echo 'FIND_LIBRARY(OPENFRAMES_LIBRARY NAMES OpenFrames PATHS /app/lib NO_DEFAULT_PATH)' >> GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/CMakeModules/SetupOpenFrames.cmake
+          - echo 'FIND_LIBRARY(OPENFRAMES_LIBRARY_DEBUG NAMES OpenFramesd PATHS /app/lib NO_DEFAULT_PATH)' >> GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/CMakeModules/SetupOpenFrames.cmake
           # Fix HiDPI quarter-screen OpenGL viewport bug: GetClientSize() returns logical pixels
           # but the GL framebuffer is physical pixels. Multiply by GetContentScaleFactor() (=2 on 200% displays).
           - sed -i 's/glViewport(0, 0, nWidth, nHeight);/glViewport(0, 0, (int)(nWidth*GetContentScaleFactor()), (int)(nHeight*GetContentScaleFactor()));/' GMAT-R2026a/src/gui/subscriber/ViewCanvas.cpp
           - sed -i 's/glViewport(0, 0, (GLint) nWidth, (GLint) nHeight);/glViewport(0, 0, (GLint)(nWidth*GetContentScaleFactor()), (GLint)(nHeight*GetContentScaleFactor()));/g' GMAT-R2026a/src/gui/subscriber/OrbitViewCanvas.cpp GMAT-R2026a/src/gui/subscriber/GroundTrackCanvas.cpp
           - sed -i 's/GLint h = GetSize().GetHeight();/GLint h = (GLint)(GetSize().GetHeight()*GetContentScaleFactor());/' GMAT-R2026a/src/gui/spacecraft/VisualModelCanvas.cpp
           - sed -i 's/GLint w = GetSize().GetWidth();/GLint w = (GLint)(GetSize().GetWidth()*GetContentScaleFactor());/' GMAT-R2026a/src/gui/spacecraft/VisualModelCanvas.cpp
+          # Fix HiDPI quarter-screen bug in OpenFramesInterface: OFGLCanvas passes logical pixels to
+          # OSG's embedded WindowProxy. Scale window dimensions and mouse coordinates by the content
+          # scale factor so the OSG viewport matches the physical GL framebuffer.
+          - python3 -c "f='GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/gui/subscriber/wx/OFGLCanvas.cpp'; t=open(f).read(); t=t.replace('resizeWindow(0, 0, event.GetSize().GetWidth(), event.GetSize().GetHeight())', 'resizeWindow(0, 0, (int)(event.GetSize().GetWidth()*GetContentScaleFactor()), (int)(event.GetSize().GetHeight()*GetContentScaleFactor()))'); t=t.replace('event.GetX()', '(int)(event.GetX()*GetContentScaleFactor())'); t=t.replace('event.GetY()', '(int)(event.GetY()*GetContentScaleFactor())'); open(f,'w').write(t)"
+          # OFScene creates the OSG WindowProxy with the initial canvas dimensions — scale those too.
+          - python3 -c "f='GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/gui/subscriber/wx/OFScene.cpp'; t=open(f).read(); t=t.replace('mCanvas->GetSize().GetWidth(), mCanvas->GetSize().GetHeight()', '(int)(mCanvas->GetSize().GetWidth()*mCanvas->GetContentScaleFactor()), (int)(mCanvas->GetSize().GetHeight()*mCanvas->GetContentScaleFactor())'); open(f,'w').write(t)"
+          # GmatApp::OnExit() calls exit(0) which runs C++ static destructors including OSG's global
+          # registry while the OFI render thread is still alive → SIGSEGV / GNOME crash dialog.
+          # _exit() terminates without running static destructors; the OS cleans up threads.
+          - sed -i 's|#include <wx/log.h>|#include <wx/log.h>\n#include <unistd.h>|' GMAT-R2026a/src/gui/app/GmatApp.cpp
+          - sed -i 's/      exit(exitCode);/      _exit(exitCode);/' GMAT-R2026a/src/gui/app/GmatApp.cpp
+          # OFScene::StopOpenFrames() only joins when isAnimating() — misses paused/initializing states.
+          # Always call shutdown(); join only when the thread is actually running (isRunning()).
+          - python3 -c "f='GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/gui/subscriber/wx/OFScene.cpp'; t=open(f).read(); t=t.replace('      if (mWinProxy->isAnimating())\n      {\n         mWinProxy->shutdown();\n         mWinProxy->join();\n      }', '      mWinProxy->shutdown();\n      if (mWinProxy->isRunning())\n         mWinProxy->join();'); open(f,'w').write(t)"
 
   - name: gmat-config
     buildsystem: simple
@@ -251,6 +332,12 @@ modules:
       - install -Dm644 org.nasa.gmat.desktop /app/share/applications/org.nasa.gmat.desktop
       - install -Dm644 org.nasa.gmat.metainfo.xml /app/share/metainfo/org.nasa.gmat.metainfo.xml
       - install -Dm755 gmat-launch.sh /app/bin/gmat-launch.sh
+      # Bundle fonts for OSG text rendering. OSG searches OSG_FILE_PATH (set in finish-args).
+      # Arial is not available (proprietary); LiberationSans is metric-compatible and installed as arial.ttf.
+      # courbd.ttf (Courier New Bold) → LiberationMono-Bold as the nearest free substitute.
+      - install -Dm644 /usr/share/fonts/liberation-fonts/LiberationSans-Regular.ttf /app/share/osg-fonts/arial.ttf
+      - install -Dm644 /usr/share/fonts/liberation-fonts/LiberationMono-Bold.ttf /app/share/osg-fonts/LiberationMono-Bold.ttf
+      - install -Dm644 /usr/share/fonts/liberation-fonts/LiberationMono-Bold.ttf /app/share/osg-fonts/courbd.ttf
 
     sources:
       - type: file

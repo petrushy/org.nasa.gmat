@@ -93,7 +93,10 @@ All patches live in the `type: shell` commands of the `gmat` module and are appl
 **2. HiDPI quarter-screen OpenGL viewport — `ViewCanvas.cpp`, `OrbitViewCanvas.cpp`, `GroundTrackCanvas.cpp`, `VisualModelCanvas.cpp`**
 GMAT calls `GetClientSize()` → `glViewport()` directly. On HiDPI displays (e.g. 200% Wayland), `GetClientSize()` returns logical pixels but the GL framebuffer is physical pixels, so only the bottom-left quarter renders. Fixed by multiplying by `GetContentScaleFactor()` in all four `glViewport` call sites.
 
-**3. GMATWin32.ico replacement**
+**3. HiDPI quarter-screen viewport — OpenFramesInterface (OFGLCanvas.cpp, OFScene.cpp)**
+Same root cause as patch 2, but in the OFI plugin. `OFGLCanvas::Resized` passes `event.GetSize().GetWidth/Height()` (logical) to `windowProxy->resizeWindow()`; all mouse event handlers pass `event.GetX()/GetY()` (logical) to `windowProxy->mouseMotion/buttonPress/buttonRelease()`. `OFScene` creates the `WindowProxy` with `mCanvas->GetSize().GetWidth/Height()` (logical). All fixed by multiplying by `GetContentScaleFactor()`. Mouse coordinates must be in the same pixel space as the window dimensions, so they are scaled too. sed cannot be used (strings contain regex metacharacters); Python `str.replace()` one-liners are used instead.
+
+**4. GMATWin32.ico replacement**
 GMAT's cmake installs `GMATWin32.ico` (Windows ICO format) as the app icon, but wxWidgets on Linux cannot load ICO files, causing a warning dialog at startup. Fixed by overwriting the `.ico` in the source tree with a PNG before cmake runs, so cmake installs the PNG.
 
 ### Plugin configuration
@@ -101,14 +104,22 @@ GMAT's cmake installs `GMATWin32.ico` (Windows ICO format) as the app icon, but 
 `gmat_startup_file.txt` lists all GMAT plugins loaded at runtime (all resolved under `/app/plugins/`). Notable:
 - Python plugin is pinned to `libPythonInterface_py312` to match the bundled Python 3.12 build
 - `libMatlabInterface` is **commented out** — MATLAB is not installed in the Flatpak
-- `libOpenFramesInterface` and `libOVtoOFI` are **commented out** — these require OpenSceneGraph (OSG), which is not in the freedesktop 25.08 runtime. Future enhancement: add OSG as a module and enable `-DPLUGIN_OPENFRAMESINTERFACE=ON`
+- `libOpenFramesInterface` and `libOVtoOFI` are **enabled** — OSG and OpenFrames are built as Flatpak modules (openscenegraph, openframes). `-DPLUGIN_OPENFRAMESINTERFACE=ON` is set in the gmat cmake config. Known issue: the OFI window crashes when dragged between Wayland outputs ("Broken pipe").
 
 ### Cleanup
 
 A global `cleanup` section strips development artifacts and unused tools from the final bundle before export. It runs during the finish phase and does NOT invalidate module build caches. Current cleanup removes: all headers (`/include`), pkg-config files, static libs (`.a`, `.la`), wxWidgets build-system files (`bakefile`, `aclocal`), tcsh (only needed at build time for cspice), Xerces-C CLI tools, unused Python tools (idle, pydoc, 2to3), and the Python test suite and lib2to3.
+
+### OSG font configuration
+
+OSG searches `OSG_FILE_PATH` (set via finish-args: `/app/share/osg-fonts`) for fonts. The freedesktop runtime puts Liberation fonts at `/usr/share/fonts/liberation-fonts/` — a path OFI's hardcoded font list doesn't know. The `gmat-config` module copies the needed fonts into `/app/share/osg-fonts/` at build time:
+- `arial.ttf` ← LiberationSans-Regular (metric-compatible; proprietary Arial not redistributable)
+- `LiberationMono-Bold.ttf` ← direct copy (for OFI HUD epoch text)
+- `courbd.ttf` ← LiberationMono-Bold (monospace bold substitute for Courier New Bold)
 
 ### Remaining work for Flathub submission
 
 - Add a real screenshot to `org.nasa.gmat.metainfo.xml` (required by Flathub — add `<image>` URL inside the `<screenshot>` block)
 - Tighten sandbox: `--filesystem=home` is too broad; narrow to specific paths
 - aarch64 support: cspice is currently x86_64-only (pre-compiled binary from NAIF); building cspice from source would enable aarch64
+- Investigate OFI crash when dragging between Wayland outputs ("Broken pipe" / Wayland surface invalidation)

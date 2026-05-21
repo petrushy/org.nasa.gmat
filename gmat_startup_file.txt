@@ -81,9 +81,9 @@ PLUGIN                  = /app/plugins/thinksys/libTLEPropagator
 # PLUGIN                  = /app/plugins/proprietary/libSNOptimizer
 # PLUGIN                  = /app/plugins/proprietary/libVF13Optimizer
 
-# External plugins (require OpenSceneGraph, not in freedesktop runtime — disabled)
-# PLUGIN                  = /app/plugins/libOpenFramesInterface
-# PLUGIN                  = /app/plugins/libOVtoOFI
+# OpenFrames 3D visualization plugins (require OpenSceneGraph and OpenFrames, built as Flatpak modules)
+PLUGIN                  = /app/plugins/libOpenFramesInterface
+PLUGIN                  = /app/plugins/libOVtoOFI
 
 #-----------------------------------------------------------
 # Directory/file paths
