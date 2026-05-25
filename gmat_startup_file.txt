@@ -78,7 +78,7 @@ PLUGIN                  = /app/plugins/thinksys/libTLEPropagator
 # PLUGIN                  = /app/plugins/proprietary/libMarsGRAM
 # PLUGIN                  = /app/plugins/proprietary/libMsise86
 # PLUGIN                  = /app/plugins/proprietary/libNRLMsise00
-# PLUGIN                  = /app/plugins/proprietary/libSNOptimizer
+# PLUGIN                  = /app/plugins/proprietary/libSNOptimizer  # proprietary: requires paid SNOPT license from Stanford; cannot redistribute
 # PLUGIN                  = /app/plugins/proprietary/libVF13Optimizer
 
 # OpenFrames 3D visualization plugins (require OpenSceneGraph and OpenFrames, built as Flatpak modules)

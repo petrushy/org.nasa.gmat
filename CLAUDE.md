@@ -24,14 +24,14 @@ git submodule update --init
 
 ### Build and install the Flatpak (user installation)
 ```bash
-flatpak run org.flatpak.Builder --user --install --force-clean build-dir org.nasa.gmat.yaml
+flatpak-builder --user --install --force-clean build-dir org.nasa.gmat.yaml
 ```
 
-`flatpak-builder` is installed as `org.flatpak.Builder` (Flatpak app), not a system package. Do NOT pass `--keep-build-dirs` — it gets forwarded to `flatpak install` and fails.
+`flatpak-builder` is installed as a system binary at `/usr/bin/flatpak-builder`. Do NOT pass `--keep-build-dirs` — it gets forwarded to `flatpak install` and fails.
 
 ### Rebuild only config/scripts (fast — skips GMAT recompile)
 ```bash
-flatpak run org.flatpak.Builder --user --install --force-clean build-dir org.nasa.gmat.yaml
+flatpak-builder --user --install --force-clean build-dir org.nasa.gmat.yaml
 ```
 Without `--force-clean` the build dir won't be empty and will error. With `--force-clean`, unchanged modules hit the cache and only changed modules rebuild. Changing only `gmat_startup_file.txt` or `gmat-launch.sh` rebuilds only `gmat-config` (seconds).
 
@@ -93,10 +93,13 @@ All patches live in the `type: shell` commands of the `gmat` module and are appl
 **2. HiDPI quarter-screen OpenGL viewport — `ViewCanvas.cpp`, `OrbitViewCanvas.cpp`, `GroundTrackCanvas.cpp`, `VisualModelCanvas.cpp`**
 GMAT calls `GetClientSize()` → `glViewport()` directly. On HiDPI displays (e.g. 200% Wayland), `GetClientSize()` returns logical pixels but the GL framebuffer is physical pixels, so only the bottom-left quarter renders. Fixed by multiplying by `GetContentScaleFactor()` in all four `glViewport` call sites.
 
-**3. HiDPI quarter-screen viewport — OpenFramesInterface (OFGLCanvas.cpp, OFScene.cpp)**
+**3. Missing comma in FileManager.cpp FILE_TYPE_STRING array**
+`"HELP_HTML_TUTORIALS_FILE"` is missing a trailing comma; C++ concatenates it with the next string literal `"HELP_HTML_FILE"`, shifting all subsequent enum→string mappings by one. `GetFullPathname("HELP_HTML_FILE")` returns an empty string, triggering the startup warning "Help file '' does not exist." Fixed by adding the missing comma via `sed`.
+
+**4. HiDPI quarter-screen viewport — OpenFramesInterface (OFGLCanvas.cpp, OFScene.cpp)**
 Same root cause as patch 2, but in the OFI plugin. `OFGLCanvas::Resized` passes `event.GetSize().GetWidth/Height()` (logical) to `windowProxy->resizeWindow()`; all mouse event handlers pass `event.GetX()/GetY()` (logical) to `windowProxy->mouseMotion/buttonPress/buttonRelease()`. `OFScene` creates the `WindowProxy` with `mCanvas->GetSize().GetWidth/Height()` (logical). All fixed by multiplying by `GetContentScaleFactor()`. Mouse coordinates must be in the same pixel space as the window dimensions, so they are scaled too. sed cannot be used (strings contain regex metacharacters); Python `str.replace()` one-liners are used instead.
 
-**4. GMATWin32.ico replacement**
+**5. GMATWin32.ico replacement**
 GMAT's cmake installs `GMATWin32.ico` (Windows ICO format) as the app icon, but wxWidgets on Linux cannot load ICO files, causing a warning dialog at startup. Fixed by overwriting the `.ico` in the source tree with a PNG before cmake runs, so cmake installs the PNG.
 
 ### Plugin configuration
@@ -104,6 +107,7 @@ GMAT's cmake installs `GMATWin32.ico` (Windows ICO format) as the app icon, but 
 `gmat_startup_file.txt` lists all GMAT plugins loaded at runtime (all resolved under `/app/plugins/`). Notable:
 - Python plugin is pinned to `libPythonInterface_py312` to match the bundled Python 3.12 build
 - `libMatlabInterface` is **commented out** — MATLAB is not installed in the Flatpak
+- `libSNOptimizer` is **commented out** — SNOPT (Stanford's Sparse Nonlinear OPTimizer) is proprietary commercial software requiring a separate paid license from Stanford; it cannot be bundled or redistributed. Scripts in `samples/NeedSNOPT/` will not run.
 - `libOpenFramesInterface` and `libOVtoOFI` are **enabled** — OSG and OpenFrames are built as Flatpak modules (openscenegraph, openframes). `-DPLUGIN_OPENFRAMESINTERFACE=ON` is set in the gmat cmake config. Known issue: the OFI window crashes when dragged between Wayland outputs ("Broken pipe").
 
 ### Cleanup

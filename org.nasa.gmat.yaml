@@ -113,6 +113,8 @@ modules:
 
   - name: libglu
     buildsystem: meson
+    config-opts:
+      - --libdir=lib
     sources:
       - type: git
         url: "https://gitlab.freedesktop.org/mesa/glu.git"
@@ -171,6 +173,7 @@ modules:
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DCMAKE_INSTALL_PREFIX=/app
+      - -DCMAKE_INSTALL_LIBDIR=lib
       - -DBUILD_SHARED_LIBS=ON
       - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
       - -Dnetwork-accessor=curl
@@ -192,6 +195,7 @@ modules:
     builddir: true
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_LIBDIR=lib
       - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
       - -DBUILD_OSG_APPLICATIONS=OFF
       - -DBUILD_OSG_EXAMPLES=OFF
@@ -225,6 +229,7 @@ modules:
     builddir: true
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_LIBDIR=lib
       - -DOSG_DIR=/app
       - -DOF_BUILD_DEMOS=OFF
       - -DOF_PYTHON_MODULE=OFF
@@ -260,6 +265,7 @@ modules:
     buildsystem: cmake-ninja
     subdir: GMAT-R2026a
     build-options:
+      ldflags: -Wl,-rpath-link=/app/lib
       env:
         LIBRARY_PATH: /app/lib:/usr/lib
         LD_LIBRARY_PATH: /app/lib:/usr/lib
@@ -316,6 +322,10 @@ modules:
           - python3 -c "f='GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/gui/subscriber/wx/OFGLCanvas.cpp'; t=open(f).read(); t=t.replace('resizeWindow(0, 0, event.GetSize().GetWidth(), event.GetSize().GetHeight())', 'resizeWindow(0, 0, (int)(event.GetSize().GetWidth()*GetContentScaleFactor()), (int)(event.GetSize().GetHeight()*GetContentScaleFactor()))'); t=t.replace('event.GetX()', '(int)(event.GetX()*GetContentScaleFactor())'); t=t.replace('event.GetY()', '(int)(event.GetY()*GetContentScaleFactor())'); open(f,'w').write(t)"
           # OFScene creates the OSG WindowProxy with the initial canvas dimensions — scale those too.
           - python3 -c "f='GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/gui/subscriber/wx/OFScene.cpp'; t=open(f).read(); t=t.replace('mCanvas->GetSize().GetWidth(), mCanvas->GetSize().GetHeight()', '(int)(mCanvas->GetSize().GetWidth()*mCanvas->GetContentScaleFactor()), (int)(mCanvas->GetSize().GetHeight()*mCanvas->GetContentScaleFactor())'); open(f,'w').write(t)"
+          # Fix missing comma in FileManager.cpp FILE_TYPE_STRING array: adjacent string literals
+          # "HELP_HTML_TUTORIALS_FILE" and "HELP_HTML_FILE" get concatenated, shifting all subsequent
+          # enum mappings by one and causing GetFullPathname("HELP_HTML_FILE") to return empty string.
+          - sed -i 's/"HELP_HTML_TUTORIALS_FILE"$/"HELP_HTML_TUTORIALS_FILE",/' GMAT-R2026a/src/gmatutil/util/FileManager.cpp
           # GmatApp::OnExit() calls exit(0) which runs C++ static destructors including OSG's global
           # registry while the OFI render thread is still alive → SIGSEGV / GNOME crash dialog.
           # _exit() terminates without running static destructors; the OS cleans up threads.
