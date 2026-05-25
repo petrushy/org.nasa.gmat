@@ -3,6 +3,7 @@ Type=Application
 Name=GMAT
 GenericName=Mission Analysis Tool
 Comment=Space mission design, optimization, and navigation
+Terminal=false
 Exec=/app/bin/gmat-launch.sh
 Icon=org.nasa.gmat
 Categories=Science;Education;

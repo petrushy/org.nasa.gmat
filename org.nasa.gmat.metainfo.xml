@@ -22,7 +22,8 @@
       <li>Lunar, interplanetary, and libration point mission design</li>
       <li>Targeting and optimization via differential correction and NLP solvers</li>
       <li>3D orbit visualization via OpenFrames</li>
-      <li>Python and MATLAB scripting interfaces</li>
+      <li>Python scripting interface</li>
+      <li>MATLAB scripting interface (requires separate MATLAB installation; not available in this build)</li>
       <li>Navigation and estimation tools</li>
       <li>SPICE kernel support via NAIF CSPICE</li>
     </ul>

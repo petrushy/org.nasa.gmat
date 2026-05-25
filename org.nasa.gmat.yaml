@@ -8,12 +8,10 @@ command: /app/bin/gmat-launch.sh
 
 finish-args:
   - --share=ipc
-  - --socket=fallback-x11
   - --socket=wayland
-  - --socket=x11
+  - --socket=fallback-x11
   - --device=dri
   - --share=network
-  - --filesystem=xdg-documents
   - --filesystem=home
   - --env=TMPDIR=/var/tmp
   - --filesystem=xdg-run/dconf

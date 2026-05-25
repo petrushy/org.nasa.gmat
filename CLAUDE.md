@@ -147,3 +147,4 @@ OSG searches `OSG_FILE_PATH` (set via finish-args: `/app/share/osg-fonts`) for f
 - Tighten sandbox: `--filesystem=home` is too broad; narrow to specific paths
 - aarch64 support: cspice is currently x86_64-only (pre-compiled binary from NAIF); building cspice from source would enable aarch64
 - Investigate OFI crash when dragging between Wayland outputs ("Broken pipe" / Wayland surface invalidation)
+- Dark mode not supported: GMAT's wxWidgets UI breaks in dark mode (text/icon contrast issues). `gmat-launch.sh` forces `GTK_THEME=Adwaita:light` as a workaround until GMAT upstream adds dark mode support.
