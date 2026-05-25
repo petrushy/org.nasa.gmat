@@ -15,6 +15,22 @@ This repository is a **Flatpak manifest** for packaging NASA's GMAT (General Mis
 - `org.nasa.gmat.metainfo.xml` — AppStream metadata for Flathub submission
 - `shared-modules/` — Git submodule from the Flathub shared-modules repo (provides reusable module definitions like `glew`, etc.)
 
+## Prerequisites (first-time setup)
+
+`flatpak-builder` is installed as a system binary at `/usr/bin/flatpak-builder` (not as a Flatpak app).
+
+The following Flatpak runtimes must be installed before building:
+
+```bash
+# Runtime (may already be present):
+flatpak install --user flathub org.freedesktop.Platform//25.08
+
+# SDK (required for building — easy to miss):
+flatpak install --user flathub org.freedesktop.Sdk//25.08
+```
+
+If the SDK is missing, the build fails immediately with: `Unable to find sdk org.freedesktop.Sdk version 25.08`.
+
 ## Common Commands
 
 ### Initial setup
@@ -27,7 +43,7 @@ git submodule update --init
 flatpak-builder --user --install --force-clean build-dir org.nasa.gmat.yaml
 ```
 
-`flatpak-builder` is installed as a system binary at `/usr/bin/flatpak-builder`. Do NOT pass `--keep-build-dirs` — it gets forwarded to `flatpak install` and fails.
+Do NOT pass `--keep-build-dirs` — it gets forwarded to `flatpak install` and fails.
 
 ### Rebuild only config/scripts (fast — skips GMAT recompile)
 ```bash
@@ -56,13 +72,17 @@ The manifest builds and installs all dependencies from source into `/app`, in th
 
 1. **glew** — via `shared-modules/glew/glew.json`
 2. **Python 3.12.13** — built with `--enable-shared`; required for GMAT's Python plugin (`libPythonInterface_py312`)
-3. **libglu** — mesa/glu 9.0.3, built with meson
+3. **libglu** — mesa/glu 9.0.3, built with meson; `--libdir=lib` required (meson defaults to `lib64` on 64-bit)
 4. **wxWidgets 3.2.9** — built with GTK3 backend (`--with-gtk=3`) and OpenGL support; GTK3 is provided by the freedesktop 25.08 runtime
 5. **tcsh** — required to run the cspice `makeall.csh` build script
-6. **XercesC 3.2.5** — XML library required by GMAT, built with curl network accessor and gnuiconv transcoder
-7. **cspice** — NAIF/JPL SPICE toolkit (pre-compiled C library from JPL); the build script patches the csh shebang lines to use the just-built tcsh
-8. **gmat** — GMAT R2026a source + OpenFramesInterface R2025a_v1 plugin, built with CMake pointing at `/app` for cspice; source patches applied before cmake (see below)
-9. **gmat-config** — Installs `gmat_startup_file.txt`, `org.nasa.gmat.desktop`, `org.nasa.gmat.metainfo.xml`, and `gmat-launch.sh`
+6. **XercesC 3.2.5** — XML library required by GMAT, built with curl network accessor and gnuiconv transcoder; `-DCMAKE_INSTALL_LIBDIR=lib` required
+7. **openscenegraph** — 3D scene graph library required by OpenFrames/OFI; `-DCMAKE_INSTALL_LIBDIR=lib` required
+8. **openframes** — high-level 3D space visualization library built on OSG; `-DCMAKE_INSTALL_LIBDIR=lib` required
+9. **cspice** — NAIF/JPL SPICE toolkit (pre-compiled C library from JPL); the build script patches the csh shebang lines to use the just-built tcsh
+10. **gmat** — GMAT R2026a source + OpenFramesInterface R2025a_v1 plugin, built with CMake pointing at `/app` for cspice; `-Wl,-rpath-link=/app/lib` needed for transitive xerces-c dep; source patches applied before cmake (see below)
+11. **gmat-config** — Installs `gmat_startup_file.txt`, `org.nasa.gmat.desktop`, `org.nasa.gmat.metainfo.xml`, and `gmat-launch.sh`
+
+> **Note on `CMAKE_INSTALL_LIBDIR`:** cmake defaults to `lib64` on 64-bit Linux. All cmake modules in this manifest must explicitly set `-DCMAKE_INSTALL_LIBDIR=lib` so libraries land in `/app/lib` where the flatpak build environment's `LDFLAGS=-L/app/lib` and `PKG_CONFIG_PATH` can find them. Forgetting this on a new cmake module will produce linker errors like `cannot find -lFoo` or `FooBar.so, needed by …, not found`.
 
 ### flatpak-builder cmake-ninja build phase order
 
