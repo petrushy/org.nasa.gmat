@@ -1,0 +1,244 @@
+%
+%   Kiruna_Alaska_Visibility
+%
+%   Ground station visibility analysis for a Sun-Synchronous Orbit satellite
+%   (Sentinel-3B, NORAD 43437) from ESRANGE (Kiruna, Sweden) and the
+%   Alaska Satellite Facility (Fairbanks, Alaska, USA).
+%
+%   The script propagates the satellite for 3 days from the TLE epoch and:
+%     - Generates a contact window report for each station (>= 5 deg elevation)
+%     - Displays a 3D OpenFrames view with 5 deg elevation cones on both stations
+%       (amber cone = Kiruna, cyan cone = Alaska)
+%     - Displays a 2D ground-track plot
+%
+%   TLE source: Sentinel3B.tle (same directory as this script)
+%   Output:     Kiruna_Alaska_contacts.txt  (written to OUTPUT_PATH = /var/tmp
+%               inside the Flatpak sandbox)
+%
+%   NOTE: For accurate results, replace Sentinel3B.tle with a fresh TLE
+%   from https://celestrak.org/SOCRATES/ (NORAD ID 43437) before running.
+%   SGP4 accuracy degrades significantly beyond ~2 weeks from epoch.
+%
+%   Released: R2026a example
+%
+
+
+%----------------------------------------
+%---------- FieldOfView Definitions
+%----------------------------------------
+
+% 5 deg elevation mask: cone angle from zenith = 90 - 5 = 85 deg.
+% ConicalFOV is not supported on GroundStation antennas; CustomFOV must be
+% used instead. The 24 evenly-spaced (clock, cone) pairs trace an identical
+% circle at 85 deg from zenith.
+Create CustomFOV KirunaFOVShape;
+
+KirunaFOVShape.Color       = [255 200 50];   % Amber
+KirunaFOVShape.Alpha       = 70;
+KirunaFOVShape.ConeAngles  = [ 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 ];
+KirunaFOVShape.ClockAngles = [ 0 15 30 45 60 75 90 105 120 135 150 165 180 195 210 225 240 255 270 285 300 315 330 345 ];
+
+Create CustomFOV AlaskaFOVShape;
+
+AlaskaFOVShape.Color       = [50 200 255];   % Cyan
+AlaskaFOVShape.Alpha       = 70;
+AlaskaFOVShape.ConeAngles  = [ 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 85 ];
+AlaskaFOVShape.ClockAngles = [ 0 15 30 45 60 75 90 105 120 135 150 165 180 195 210 225 240 255 270 285 300 315 330 345 ];
+
+%----------------------------------------
+%---------- Antenna (Sensor) Definitions
+%----------------------------------------
+
+Create Antenna KirunaAntenna;
+
+KirunaAntenna.FieldOfView      = KirunaFOVShape;
+KirunaAntenna.DirectionX       = 0;
+KirunaAntenna.DirectionY       = 0;
+KirunaAntenna.DirectionZ       = 1;    % Zenith (local up in station body frame)
+KirunaAntenna.SecondDirectionX = 1;
+KirunaAntenna.SecondDirectionY = 0;
+KirunaAntenna.SecondDirectionZ = 0;
+KirunaAntenna.HWOriginInBCSX   = 0;
+KirunaAntenna.HWOriginInBCSY   = 0;
+KirunaAntenna.HWOriginInBCSZ   = 0;
+
+Create Antenna AlaskaAntenna;
+
+AlaskaAntenna.FieldOfView      = AlaskaFOVShape;
+AlaskaAntenna.DirectionX       = 0;
+AlaskaAntenna.DirectionY       = 0;
+AlaskaAntenna.DirectionZ       = 1;
+AlaskaAntenna.SecondDirectionX = 1;
+AlaskaAntenna.SecondDirectionY = 0;
+AlaskaAntenna.SecondDirectionZ = 0;
+AlaskaAntenna.HWOriginInBCSX   = 0;
+AlaskaAntenna.HWOriginInBCSY   = 0;
+AlaskaAntenna.HWOriginInBCSZ   = 0;
+
+%----------------------------------------
+%---------- Ground Stations
+%----------------------------------------
+
+Create GroundStation KirunaGS;
+
+KirunaGS.StateType             = Spherical;
+KirunaGS.Location1             = 67.883;    % Geodetic latitude  (deg N)
+KirunaGS.Location2             = 21.067;    % East longitude     (deg, 0-360)
+KirunaGS.Location3             = 0.320;     % Altitude           (km)
+KirunaGS.Id                    = 'KirunaGS';
+KirunaGS.MinimumElevationAngle = 5.0;
+KirunaGS.AddHardware           = {KirunaAntenna};
+
+Create GroundStation AlaskaGS;
+
+AlaskaGS.StateType             = Spherical;
+AlaskaGS.Location1             = 64.867;    % Geodetic latitude  (deg N)
+AlaskaGS.Location2             = 212.183;   % East longitude     (= 360 - 147.817 W, Fairbanks AK)
+AlaskaGS.Location3             = 0.167;     % Altitude           (km)
+AlaskaGS.Id                    = 'AlaskaGS';
+AlaskaGS.MinimumElevationAngle = 5.0;
+AlaskaGS.AddHardware           = {AlaskaAntenna};
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+Create Spacecraft SENTINEL3B;
+
+SENTINEL3B.EphemerisName = 'Sentinel3B.tle';
+SENTINEL3B.Id            = '43437';
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+
+Create Propagator TLEProp;
+
+TLEProp.Type            = SPICESGP4;
+TLEProp.InitialStepSize = 60;
+
+%----------------------------------------
+%---------- Event Locators
+%----------------------------------------
+
+Create ContactLocator StationContacts;
+
+StationContacts.Target               = SENTINEL3B;
+StationContacts.Filename             = 'Kiruna_Alaska_contacts.txt';
+StationContacts.StepSize             = 60;
+StationContacts.UseLightTimeDelay    = true;
+StationContacts.UseStellarAberration = true;
+StationContacts.WriteReport          = true;
+StationContacts.RunMode              = Automatic;
+StationContacts.UseEntireInterval    = true;
+StationContacts.Observers            = {KirunaGS, AlaskaGS};
+StationContacts.LightTimeDirection   = Transmit;
+
+Create ContactLocator StationContactsMaxEl;
+
+StationContactsMaxEl.Target               = SENTINEL3B;
+StationContactsMaxEl.Filename             = 'Kiruna_Alaska_contacts_maxel.txt';
+StationContactsMaxEl.StepSize             = 60;
+StationContactsMaxEl.UseLightTimeDelay    = true;
+StationContactsMaxEl.UseStellarAberration = true;
+StationContactsMaxEl.WriteReport          = true;
+StationContactsMaxEl.RunMode              = Automatic;
+StationContactsMaxEl.UseEntireInterval    = true;
+StationContactsMaxEl.Observers            = {KirunaGS, AlaskaGS};
+StationContactsMaxEl.LightTimeDirection   = Transmit;
+StationContactsMaxEl.ReportFormat         = 'SiteViewMaxElevationReport';
+StationContactsMaxEl.ReportTimeFormat     = 'UTCGregorian';
+
+%----------------------------------------
+%---------- Subscribers
+%----------------------------------------
+
+Create OpenFramesSensorMask KirunaFOV;
+
+KirunaFOV.Source     = KirunaGS;
+KirunaFOV.Hardware   = KirunaAntenna;
+KirunaFOV.Label      = 'Kiruna 5 deg';
+KirunaFOV.LengthType = Manual;
+KirunaFOV.Length     = 2500;   % km - extends well past satellite altitude (~814 km)
+
+Create OpenFramesSensorMask AlaskaFOV;
+
+AlaskaFOV.Source     = AlaskaGS;
+AlaskaFOV.Hardware   = AlaskaAntenna;
+AlaskaFOV.Label      = 'Alaska 5 deg';
+AlaskaFOV.LengthType = Manual;
+AlaskaFOV.Length     = 2500;
+
+Create OpenFramesView EarthView;
+
+EarthView.ViewFrame         = Earth;
+EarthView.ViewTrajectory    = Off;
+EarthView.InertialFrame     = Off;
+EarthView.SetDefaultLocation = On;
+EarthView.SetCurrentLocation = Off;
+EarthView.DefaultEye        = [ 0 0 40000 ];   % Above North Pole - shows polar orbit
+EarthView.DefaultCenter     = [ 0 0 0 ];
+EarthView.DefaultUp         = [ 0 1 0 ];
+EarthView.FOVy              = 45;
+
+% Objects: SENTINEL3B  KirunaGS  AlaskaGS  Earth  (arrays must match this order)
+Create OpenFramesInterface OFI_3DView;
+
+OFI_3DView.SolverIterations    = Current;
+OFI_3DView.UpperLeft           = [ 0.0 0.0 ];
+OFI_3DView.Size                = [ 0.6 0.55 ];
+OFI_3DView.RelativeZOrder      = 500;
+OFI_3DView.Maximized           = false;
+OFI_3DView.Add                 = {SENTINEL3B, KirunaGS, AlaskaGS, Earth};
+OFI_3DView.View                = {EarthView};
+OFI_3DView.SensorMask          = {KirunaFOV, AlaskaFOV};
+OFI_3DView.CoordinateSystem    = EarthMJ2000Eq;
+OFI_3DView.DrawObject          = [ true true true true ];
+OFI_3DView.DrawTrajectory      = [ true false false false ];
+OFI_3DView.DrawAxes            = [ false false false false ];
+OFI_3DView.DrawXYPlane         = [ false false false false ];
+OFI_3DView.DrawLabel           = [ true true true false ];
+OFI_3DView.DrawUsePropLabel    = [ false false false false ];
+OFI_3DView.DrawCenterPoint     = [ true false false false ];
+OFI_3DView.DrawEndPoints       = [ true false false false ];
+OFI_3DView.DrawVelocity        = [ false false false false ];
+OFI_3DView.DrawGrid            = [ false false false false ];
+OFI_3DView.DrawLineWidth       = [ 2 2 2 2 ];
+OFI_3DView.DrawMarkerSize      = [ 10 10 10 10 ];
+OFI_3DView.DrawFontSize        = [ 14 14 14 14 ];
+OFI_3DView.Axes                = Off;
+OFI_3DView.XYPlane             = Off;
+OFI_3DView.EclipticPlane       = Off;
+OFI_3DView.EnableStars         = On;
+OFI_3DView.StarCount           = 40000;
+OFI_3DView.ShowPlot            = true;
+OFI_3DView.ShowToolbar         = true;
+OFI_3DView.SolverIterLastN     = 1;
+OFI_3DView.PlaybackTimeScale   = 3600;
+OFI_3DView.MultisampleAntiAliasing = On;
+OFI_3DView.MSAASamples         = 2;
+
+Create GroundTrackPlot GroundTrack;
+
+GroundTrack.UpperLeft      = [ 0.0 0.56 ];
+GroundTrack.Size           = [ 0.6 0.43 ];
+GroundTrack.Add            = {SENTINEL3B, KirunaGS, AlaskaGS};
+
+%----------------------------------------
+%---------- Variables
+%----------------------------------------
+
+Create Variable dummy;
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+
+BeginMissionSequence;
+
+Propagate TLEProp(SENTINEL3B) {SENTINEL3B.ElapsedDays = 3.0};
+
+% After propagation the ContactLocators have written their output files.
+% Call the Python summary module to produce a per-day contact-minutes report
+% at /var/tmp/Kiruna_Alaska_daily_summary.txt
+[dummy] = Python.contact_summary.summarize(dummy);

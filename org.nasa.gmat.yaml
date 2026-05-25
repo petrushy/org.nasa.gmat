@@ -346,6 +346,9 @@ modules:
       - install -Dm644 /usr/share/fonts/liberation-fonts/LiberationSans-Regular.ttf /app/share/osg-fonts/arial.ttf
       - install -Dm644 /usr/share/fonts/liberation-fonts/LiberationMono-Bold.ttf /app/share/osg-fonts/LiberationMono-Bold.ttf
       - install -Dm644 /usr/share/fonts/liberation-fonts/LiberationMono-Bold.ttf /app/share/osg-fonts/courbd.ttf
+      # Example Python module: daily contact-minutes summary called from the
+      # Kiruna_Alaska_Visibility script via Python.contact_summary.summarize()
+      - install -Dm644 contact_summary.py /app/userfunctions/python/contact_summary.py
 
     sources:
       - type: file
@@ -356,6 +359,8 @@ modules:
         path: org.nasa.gmat.metainfo.xml
       - type: file
         path: gmat-launch.sh
+      - type: file
+        path: Examples/contact_summary.py
 
 
 # flatpak run org.flatpak.Builder --user --install --force-clean build-dir org.nasa.gmat.yaml
