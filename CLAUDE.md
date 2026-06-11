@@ -17,7 +17,7 @@ This repository is a **Flatpak manifest** for packaging NASA's GMAT (General Mis
 
 ## Prerequisites (first-time setup)
 
-`flatpak-builder` is installed as a system binary at `/usr/bin/flatpak-builder` (not as a Flatpak app).
+`flatpak-builder` is installed as a Flatpak app (`org.flatpak.Builder`), not a system binary. Invoke it with `flatpak run org.flatpak.Builder`.
 
 The following Flatpak runtimes must be installed before building:
 

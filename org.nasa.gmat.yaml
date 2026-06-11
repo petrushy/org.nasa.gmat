@@ -329,9 +329,24 @@ modules:
           # _exit() terminates without running static destructors; the OS cleans up threads.
           - sed -i 's|#include <wx/log.h>|#include <wx/log.h>\n#include <unistd.h>|' GMAT-R2026a/src/gui/app/GmatApp.cpp
           - sed -i 's/      exit(exitCode);/      _exit(exitCode);/' GMAT-R2026a/src/gui/app/GmatApp.cpp
+          # DynamicLibrary::LoadDynLibrary() opens plugins with RTLD_LAZY. When the plugin is later
+          # dlclose()'d during shutdown, its code pages are unmapped while wxWidgets still holds
+          # OFI-derived objects (OFGLCanvas, OFScene) whose vtable pointers point into the now-
+          # unmapped library → SIGSEGV (ip==addr in unmapped .eh_frame region, error 14).
+          # RTLD_NODELETE prevents dlclose() from unmapping the library; it remains resident until
+          # process exit, keeping all vtable pointers valid through the shutdown sequence.
+          - sed -i 's/dlopen(libFullName.c_str(), RTLD_LAZY)/dlopen(libFullName.c_str(), RTLD_LAZY | RTLD_NODELETE)/' GMAT-R2026a/src/base/plugin/DynamicLibrary.cpp
+          - sed -i 's/dlopen(nameWithPath.c_str(), RTLD_LAZY)/dlopen(nameWithPath.c_str(), RTLD_LAZY | RTLD_NODELETE)/' GMAT-R2026a/src/base/plugin/DynamicLibrary.cpp
           # OFScene::StopOpenFrames() only joins when isAnimating() — misses paused/initializing states.
           # Always call shutdown(); join only when the thread is actually running (isRunning()).
           - python3 -c "f='GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/gui/subscriber/wx/OFScene.cpp'; t=open(f).read(); t=t.replace('      if (mWinProxy->isAnimating())\n      {\n         mWinProxy->shutdown();\n         mWinProxy->join();\n      }', '      mWinProxy->shutdown();\n      if (mWinProxy->isRunning())\n         mWinProxy->join();'); open(f,'w').write(t)"
+          # OFGLCanvas::~OFGLCanvas() is empty, but its parent wxGLCanvasEGL destructor tears down
+          # the GL context while the OFScene render thread may still be alive — the thread crashes
+          # trying to use the destroyed context (SIGSEGV, ip==addr, vtable corruption pattern).
+          # Call StopOpenFrames() first to join the render thread before any GL teardown.
+          # StopOpenFrames() is private so grant OFGLCanvas friend access via the header.
+          - python3 -c "f='GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/gui/subscriber/wx/OFScene.hpp'; t=open(f).read(); t=t.replace('private:\n', 'private:\n   friend class OFGLCanvas;\n'); open(f,'w').write(t)"
+          - python3 -c "f='GMAT-R2026a/OpenFramesInterface-R2025a_v1/src/gui/subscriber/wx/OFGLCanvas.cpp'; t=open(f).read(); t=t.replace('OFGLCanvas::~OFGLCanvas()\n{\n   // nothing to do here\n}', 'OFGLCanvas::~OFGLCanvas()\n{\n   mScene.StopOpenFrames();\n}'); open(f,'w').write(t)"
 
   - name: gmat-config
     buildsystem: simple
