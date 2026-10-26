@@ -4,9 +4,13 @@ This is a flatpak manifest to build the GMAT tool in a reproducable flatpak cont
 
 This manifest is not from the GMAT project and has no affiliaction with it. Use it at your own risk.
 
-To build it and install on user do:
+Install Flatpak Builder and the build dependencies:
 
-    flatpak-builder --user --install  --force-clean --install-deps-from --keep-build-dirs  build-dir org.nasa.gmat.yaml 
+    flatpak install --user flathub org.flatpak.Builder org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08
+
+To build and install for the current user:
+
+    flatpak run org.flatpak.Builder --user --install --force-clean --install-deps-from=flathub build-dir org.nasa.gmat.yaml
 
 To run:
 
@@ -47,4 +51,3 @@ https://gitlab.com/digitalsats/gmat2020a-box
 https://discourse.flathub.org/
 
 https://github.com/flathub
-

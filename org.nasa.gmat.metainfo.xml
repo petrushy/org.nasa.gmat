@@ -38,8 +38,8 @@
 
   <screenshots>
     <screenshot type="default">
-      <!-- TODO: host a screenshot and add <image>https://…/screenshot.png</image> before Flathub submission -->
-      <caption>GMAT main window with mission sequence and resource tree</caption>
+      <image>https://a.fsdn.com/con/app/proj/gmat/screenshots/GMAT_OFI_LCROSS.png/max/max/1</image>
+      <caption>LCROSS and LRO mission visualization with OpenFramesInterface</caption>
     </screenshot>
   </screenshots>
 
